@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fintech.zend.dto.SignupRequest;
 import com.fintech.zend.dto.SignupResponse;
 import com.fintech.zend.dto.LoginRequest;
+import com.fintech.zend.dto.LoginResponse;
 import com.fintech.zend.service.AuthService;
 
 @RestController
@@ -35,12 +36,17 @@ public class AuthController {
         }
     }
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
 
-        authService.login(
+        try {
+            authService.login(
                 request.getemailorAccountNumber(),
                 request.getPassword());
 
-        return ResponseEntity.ok("Login successful.");
+        return ResponseEntity.ok(new LoginResponse("Login successful."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new LoginResponse(e.getMessage()));
+        }
     }
 }
