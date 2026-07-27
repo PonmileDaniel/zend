@@ -2,7 +2,6 @@ package com.fintech.zend.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fintech.zend.dto.CreateAccountRequest;
 import com.fintech.zend.dto.DepositRequest;
 import com.fintech.zend.dto.TransferRequest;
 import com.fintech.zend.model.BankAccount;
@@ -26,13 +24,6 @@ public class BankController {
 
     public BankController(BankService bank) {
         this.bank = bank;
-    }
-
-    @PostMapping
-    public ResponseEntity<String> createAccount(@RequestBody CreateAccountRequest request) {
-        bank.createAccount(request.getHolderName());
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Account created for " + request.getHolderName());
     }
 
     @PostMapping("/transfer")
