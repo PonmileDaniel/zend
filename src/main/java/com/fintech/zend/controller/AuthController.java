@@ -7,11 +7,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fintech.zend.dto.SignupRequest;
-import com.fintech.zend.dto.SignupResponse;
 import com.fintech.zend.dto.LoginRequest;
 import com.fintech.zend.dto.LoginResponse;
+import com.fintech.zend.dto.SignupRequest;
+import com.fintech.zend.dto.SignupResponse;
 import com.fintech.zend.service.AuthService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -36,14 +38,16 @@ public class AuthController {
         }
     }
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
 
         try {
-            authService.login(
-                request.getemailorAccountNumber(),
-                request.getPassword());
+            LoginResponse response = authService.login(request, httpRequest);
+            // authService.login(
+            //     request.getemailorAccountNumber(),
+            //     request.getPassword());
+            return ResponseEntity.ok(response);
 
-        return ResponseEntity.ok(new LoginResponse("Login successful."));
+        // return ResponseEntity.ok(new LoginResponse("Login successful."));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new LoginResponse(e.getMessage()));
