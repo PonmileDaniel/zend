@@ -1,13 +1,15 @@
 package com.fintech.zend.dto;
 
-public class DepositRequest {
-    public double amount;
+import java.math.BigDecimal;
 
-    public double getAmount() {
+public class DepositRequest {
+    public BigDecimal amount;
+
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 }
