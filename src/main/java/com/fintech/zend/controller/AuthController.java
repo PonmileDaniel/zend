@@ -25,6 +25,12 @@ public class AuthController {
         this.authService = authService;
     }
 
+    /**
+     * Creates a new user account.
+     * 
+     * @param request the details of the user to be created
+     * @return a response containing the username and account number of the created user, or an error message if the creation failed
+     */
     @PostMapping("/signup")
     public ResponseEntity<SignupResponse> signup(@RequestBody SignupRequest request) {
         try {
@@ -37,6 +43,13 @@ public class AuthController {
 
         }
     }
+    /**
+     * Logs in a user to the system.
+     * 
+     * @param request the email or account number and password of the user to log in
+     * @param httpRequest the HTTP request used to log in
+     * @return a response containing a successful login message if the login was successful, or an error message if the login failed
+     */
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
 
