@@ -87,7 +87,6 @@ public class BankAccount implements Serializable {
         tx.setTransactionType(transactionType);
         tx.setDirection(direction);
         tx.setStatus(TransactionStatus.SUCCESS);
-        // tx.setBank("ZEND");
         this.transactions.add(tx);
     }
 
