@@ -2,26 +2,45 @@ package com.fintech.zend.service;
 
 import java.util.Random;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
+import com.fintech.zend.config.CustomUserDetails;
+import com.fintech.zend.dto.LoginRequest;
+import com.fintech.zend.dto.LoginResponse;
 import com.fintech.zend.dto.SignupRequest;
 import com.fintech.zend.dto.SignupResponse;
 import com.fintech.zend.model.BankAccount;
 import com.fintech.zend.model.User;
 import com.fintech.zend.repository.BankAccountRepository;
 import com.fintech.zend.repository.UserRepository;
+import com.fintech.zend.security.SessionPrincipal;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class AuthService {
 
     private final UserRepository userRepository;
     private final BankAccountRepository accountRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
     private final Random random = new Random();
 
-
-    public AuthService(UserRepository userRepository, BankAccountRepository accountRepository) {
+    public AuthService(UserRepository userRepository, BankAccountRepository accountRepository,
+            BCryptPasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
     }
 
     public SignupResponse signup(SignupRequest request) {
@@ -36,10 +55,8 @@ public class AuthService {
         String username = generateUsername(request.getFirstName(), request.getLastName());
         String accountNumber = generateAccountNumber();
 
-        BankAccount account = new BankAccount(
-                accountNumber,
-                request.getFirstName() + " " + request.getLastName()
-        );
+        BankAccount account = new BankAccount(accountNumber);
+        String encryptedPassword = passwordEncoder.encode(request.getPassword());
 
         accountRepository.save(account);
 
@@ -47,31 +64,46 @@ public class AuthService {
                 request.getFirstName(),
                 request.getLastName(),
                 username,
-                accountNumber,
                 request.getPhoneNumber(),
                 request.getEmail(),
-                request.getPassword(),
-                account
-        );
+                encryptedPassword,
+                account);
 
         userRepository.save(user);
 
         return new SignupResponse(
-            "User Registered Successfully",
-            username,
-            accountNumber
-        );
+                "User Registered Successfully",
+                username,
+                accountNumber);
     }
 
+    public LoginResponse login(LoginRequest request, HttpServletRequest servletRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getemailorAccountNumber(), request.getPassword()));
 
-    public void login(String emailOrAccountNumber, String password) {
+            CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
 
-        User user = userRepository.findByEmail(emailOrAccountNumber)
-                .or(() -> userRepository.findByAccountNumber(emailOrAccountNumber))
-                .orElseThrow(() -> new IllegalArgumentException("Invalid credentials."));
+            SessionPrincipal principal = new SessionPrincipal(user.getId(), user.getEmail(),
+                    user.getAccountNumber());
 
-        if (!user.getPassword().equals(password)) {
-            throw new IllegalArgumentException("Invalid credentials.");
+            Authentication sessionAuthentication = new UsernamePasswordAuthenticationToken(principal, null,
+                    principal.getAuthorities());
+
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(sessionAuthentication);
+            SecurityContextHolder.setContext(context);
+
+            HttpSession session = servletRequest.getSession(true);
+
+            session.setAttribute(
+                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                    context);
+
+            return new LoginResponse("Login Successful");
+        } catch (BadCredentialsException e) {
+            throw new IllegalArgumentException("Invalid credentials");
+
         }
     }
 
@@ -90,7 +122,6 @@ public class AuthService {
         return username;
     }
 
-
     public String generateAccountNumber() {
         String accountNumber;
 
@@ -99,6 +130,6 @@ public class AuthService {
             accountNumber = String.valueOf(number);
 
         } while (accountRepository.findByAccountNumber(accountNumber).isPresent());
-            return accountNumber;  
+        return accountNumber;
     }
 }
