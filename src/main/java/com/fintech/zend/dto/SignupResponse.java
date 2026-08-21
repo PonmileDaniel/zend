@@ -11,6 +11,7 @@ public class SignupResponse {
         this.accountNumber = accountNumber;
     }
 
+
     public String getMessage() {
         return message;
     }
