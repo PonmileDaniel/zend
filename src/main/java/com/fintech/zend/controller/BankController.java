@@ -1,7 +1,5 @@
 package com.fintech.zend.controller;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,11 +25,13 @@ public class BankController {
     public BankController(BankService bank) {
         this.bank = bank;
     }
+
     /**
      * Transfer money from the authenticated user's account to another account.
      *
      * @param request a TransferRequest containing the details of the transfer
-     * @return a ResponseEntity containing a successful transfer message if the transfer was successful, or an error message if the transfer failed
+     * @return a ResponseEntity containing a successful transfer message if the
+     *         transfer was successful, or an error message if the transfer failed
      */
 
     @PostMapping("/transfer")
@@ -49,23 +49,15 @@ public class BankController {
     }
 
     /**
-     * Retrieve all bank accounts
-     *
-     * @return A ResponseEntity containing a List of BankAccount objects if the request was successful, or an error message if the request failed
-     */
-    @GetMapping
-    public ResponseEntity<List<BankAccount>> getAllAccounts() {
-        List<BankAccount> accounts = bank.getAccounts();
-        return ResponseEntity.ok(accounts);
-    }
-
-    /**
      * Retrieves the statement of a bank account.
      * 
-     * @param accountNumber the account number of the account to retrieve the statement for
-     * @return a ResponseEntity containing the BankAccount object if the request was successful, or an error message if the request failed
+     * @param accountNumber the account number of the account to retrieve the
+     *                      statement for
+     * @return a ResponseEntity containing the BankAccount object if the request was
+     *         successful, or an error message if the request failed
      * 
-     * @throws SecurityException if the authenticated user is not authorized to access the account
+     * @throws SecurityException if the authenticated user is not authorized to
+     *                           access the account
      */
     @GetMapping("/{accountNumber}/statement")
     public ResponseEntity<BankAccount> getStatement(@PathVariable String accountNumber) {
@@ -80,9 +72,11 @@ public class BankController {
      * Deposit money into a bank account
      * 
      * @param accountNumber the account number of the account to deposit into
-     * @param request the details of the deposit
-     * @return a ResponseEntity containing a successful deposit message if the deposit was successful, or an error message if the deposit failed
-     * @throws SecurityException if the authenticated user is not authorized to access the account
+     * @param request       the details of the deposit
+     * @return a ResponseEntity containing a successful deposit message if the
+     *         deposit was successful, or an error message if the deposit failed
+     * @throws SecurityException if the authenticated user is not authorized to
+     *                           access the account
      */
     @PostMapping("/{accountNumber}/deposit")
     public ResponseEntity<String> deposit(@PathVariable String accountNumber, @RequestBody DepositRequest request) {
@@ -99,13 +93,16 @@ public class BankController {
     /**
      * Retrieves the name of the holder of a bank account.
      * 
-     * @param accountNumber the account number of the account to retrieve the holder name for
-     * @return a ResponseEntity containing the name of the holder if the request was successful, or an error message if the request failed
+     * @param accountNumber the account number of the account to retrieve the holder
+     *                      name for
+     * @return a ResponseEntity containing the name of the holder if the request was
+     *         successful, or an error message if the request failed
      * 
-     * @throws SecurityException if the authenticated user is not authorized to access the account
+     * @throws SecurityException if the authenticated user is not authorized to
+     *                           access the account
      */
     @GetMapping("/{accountNumber}/holder")
     public ResponseEntity<String> getAccountHolder(@PathVariable String accountNumber) {
-        return ResponseEntity.ok(bank.getHolderName(accountNumber));
+        return ResponseEntity.ok(accountNumber);
     }
 }
