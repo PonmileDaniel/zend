@@ -1,8 +1,6 @@
 package com.fintech.zend.service;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -71,9 +69,10 @@ public class BankService {
      * Deposits money into a bank account.
      * 
      * @param accountNumber The account number to deposit into.
-     * @param amount The amount of money to deposit.
+     * @param amount        The amount of money to deposit.
      * 
-     * @throws SecurityException If the user is not authorized to deposit into the given account.
+     * @throws SecurityException        If the user is not authorized to deposit
+     *                                  into the given account.
      * @throws IllegalArgumentException If the account is not found.
      */
     @Transactional
@@ -115,28 +114,6 @@ public class BankService {
         return "TXN-" + UUID.randomUUID().toString().replace("-", "").toUpperCase();
     }
 
-
-    public void removeAccount(String accountNumber) {
-        BankAccount account = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
-        accountRepository.delete(account);
-        System.out.println("Account removed successfully");
-
-    }
-
-    public void printAllTransactions(String accountNumber) {
-        Optional<BankAccount> account = findAccount(accountNumber);
-        if (account.isEmpty()) {
-            System.out.println("Account " + accountNumber + " not found.");
-            return;
-        }
-        account.get().printStatement();
-    }
-
-    public Optional<BankAccount> findAccount(String accountNumber) {
-        return accountRepository.findByAccountNumber(accountNumber);
-    }
-
     public BigDecimal getTotalBalance() {
         return accountRepository.findAll().stream().map(BankAccount::getBalance).reduce(BigDecimal.ZERO,
                 BigDecimal::add);
@@ -155,7 +132,7 @@ public class BankService {
     // String.format("%.2f", acc.getBalance())));
     // }
 
-     // public void printAllAccounts() {
+    // public void printAllAccounts() {
     // System.out.println("\n=== All Accounts ===");
     // List<BankAccount> accounts = accountRepository.findAll();
     // if (accounts.isEmpty()) {
@@ -167,7 +144,6 @@ public class BankService {
     // + " | Balance: " + String.format("%.2f", acc.getBalance())));
     // }
 
-
     // public String getHolderName(String accountNumber) {
     // BankAccount account = accountRepository.findByAccountNumber(accountNumber)
     // .orElseThrow(() -> new IllegalArgumentException("Account not found"));
@@ -175,6 +151,28 @@ public class BankService {
     // }
 
     // public List<BankAccount> getAccounts() {
-    //     return accountRepository.findAll();
+    // return accountRepository.findAll();
     // }
+
+    // public void removeAccount(String accountNumber) {
+    // BankAccount account = accountRepository.findByAccountNumber(accountNumber)
+    // .orElseThrow(() -> new IllegalArgumentException("Account not found"));
+    // accountRepository.delete(account);
+    // System.out.println("Account removed successfully");
+
+    // }
+
+    // public void printAllTransactions(String accountNumber) {
+    // Optional<BankAccount> account = findAccount(accountNumber);
+    // if (account.isEmpty()) {
+    // System.out.println("Account " + accountNumber + " not found.");
+    // return;
+    // }
+    // account.get().printStatement();
+    // }
+
+    // public Optional<BankAccount> findAccount(String accountNumber) {
+    // return accountRepository.findByAccountNumber(accountNumber);
+    // }
+
 }
