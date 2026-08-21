@@ -1,17 +1,11 @@
 package com.fintech.zend.dto;
 
+import java.math.BigDecimal;
+
 public class TransferRequest {
-    private String from;
     private String to;
-    private double amount;
-
-    public String getFrom() {
-        return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
+    private BigDecimal amount;
+    private String description;
 
     public String getTo() {
         return to;
@@ -21,11 +15,19 @@ public class TransferRequest {
         this.to = to;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
