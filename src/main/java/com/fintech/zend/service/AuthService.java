@@ -84,6 +84,14 @@ public class AuthService {
                 accountNumber);
     }
 
+    /**
+     * Logs in a user to the system.
+     * 
+     * @param request the email or account number and password of the user to log in
+     * @param servletRequest the HTTP request used to log in
+     * @return a response containing a successful login message if the login was successful, or an error message if the login failed
+     * @throws IllegalArgumentException if the email or account number and password are invalid
+     */
     public LoginResponse login(LoginRequest request, HttpServletRequest servletRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -114,6 +122,14 @@ public class AuthService {
         }
     }
 
+    /**
+     * Generates a unique username for a user based on their first and last name.
+     * The generated username is in the format of "firstname.lastnameXXXX" where XXXX is a random number between 100 and 999.
+     * The username is guaranteed to be unique by checking against the existing usernames in the database.
+     * @param firstName the first name of the user
+     * @param lastName the last name of the user
+     * @return a unique username for the user
+     */
     private String generateUsername(String firstName, String lastName) {
 
         String username;
@@ -129,6 +145,12 @@ public class AuthService {
         return username;
     }
 
+    /**
+     * Generates a unique account number for a user.
+     * The generated account number is in the format of a 10-digit number between 1,000,000,000 and 9,999,999,999.
+     * The account number is guaranteed to be unique by checking against the existing account numbers in the database.
+     * @return a unique account number for the user
+     */
     public String generateAccountNumber() {
         String accountNumber;
 
