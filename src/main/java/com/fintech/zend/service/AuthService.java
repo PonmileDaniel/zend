@@ -43,6 +43,13 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
+    /**
+     * Registers a new user account.
+     * 
+     * @param request the details of the user to be created
+     * @return a response containing the username and account number of the created user, or an error message if the creation failed
+     * @throws IllegalArgumentException if the email or phone number already exists
+     */
     public SignupResponse signup(SignupRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already exists.");
