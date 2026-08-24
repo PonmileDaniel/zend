@@ -73,6 +73,14 @@ public class AuthController {
         }
     }
 
+    /**
+     * Creates a transaction PIN for a user.
+     * 
+     * @param request the request containing the transaction PIN
+     * @param authentication the authentication details of the user
+     * @return a ResponseEntity containing a successful message if the transaction PIN
+     *         was created successfully, or an error message if the creation failed
+     */
     @PostMapping("/transaction-pin")
     public ResponseEntity<String> createTransactionPin(@RequestBody TransactionPinRequest request,
             Authentication authentication) {
