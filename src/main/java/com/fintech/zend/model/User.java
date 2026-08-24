@@ -40,6 +40,12 @@ public class User {
     @JoinColumn(name = "bank_account_id")
     private BankAccount bankAccount;
 
+    @Column
+    private String transactionPin;
+
+    @Column(nullable = false)
+    private boolean transactionPinBoolean = false;
+
     public User() {
     }
 
@@ -112,5 +118,21 @@ public class User {
 
     public void setBankAccount(BankAccount bankAccount) {
         this.bankAccount = bankAccount;
+    }
+
+    public String getTransactionPin() {
+        return transactionPin;
+    }
+
+    public void setTransactionPin(String transactionPin) {
+        this.transactionPin = transactionPin;
+    }
+
+    public boolean isTransactionPinBoolean() {
+        return transactionPinBoolean;
+    }
+
+    public void setTransactionPinBoolean(boolean transactionPinBoolean) {
+        this.transactionPinBoolean = transactionPinBoolean;
     }
 }
