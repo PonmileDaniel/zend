@@ -1,5 +1,7 @@
 package com.fintech.zend.model;
 
+import java.beans.Transient;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,8 +45,8 @@ public class User {
     @Column
     private String transactionPin;
 
-    @Column(nullable = false)
-    private boolean transactionPinBoolean = false;
+    // @Column(nullable = false)
+    // private boolean transactionPinBoolean = false;
 
     public User() {
     }
@@ -128,11 +130,8 @@ public class User {
         this.transactionPin = transactionPin;
     }
 
-    public boolean isTransactionPinBoolean() {
-        return transactionPinBoolean;
-    }
-
-    public void setTransactionPinBoolean(boolean transactionPinBoolean) {
-        this.transactionPinBoolean = transactionPinBoolean;
+    @Transient
+    public boolean hasTransactionPin() {
+        return this.transactionPin != null && !this.transactionPin.trim().isEmpty();
     }
 }
