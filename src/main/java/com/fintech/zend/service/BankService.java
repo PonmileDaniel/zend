@@ -3,12 +3,15 @@ package com.fintech.zend.service;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fintech.zend.model.BankAccount;
 import com.fintech.zend.model.InsufficientFundsException;
+import com.fintech.zend.model.User;
 import com.fintech.zend.repository.BankAccountRepository;
+import com.fintech.zend.repository.UserRepository;
 import com.fintech.zend.security.SecurityUtils;
 import com.fintech.zend.security.SessionPrincipal;
 
@@ -16,9 +19,14 @@ import com.fintech.zend.security.SessionPrincipal;
 public class BankService {
 
     private final BankAccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
-    public BankService(BankAccountRepository accountRepository) {
+    public BankService(BankAccountRepository accountRepository, UserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
         this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -37,12 +45,25 @@ public class BankService {
      *                                  sufficient funds to make the transfer.
      */
     @Transactional
-    public void transfer(String fromNum, String toNum, BigDecimal amount, String description) {
+    public void transfer(String fromNum, String toNum, BigDecimal amount, String description, String rawPin) {
         SessionPrincipal user = SecurityUtils.getCurrentUser();
 
         if (!user.getAccountNumber().equals(fromNum)) {
             throw new SecurityException("You are not authorized to transfer from this account");
         }
+
+        User sender = userRepository.findByEmail(user.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Sender record not found"));
+
+        if (!sender.hasTransactionPin()) {
+            throw new IllegalStateException("You must set up a 4-digit transaction PIN before making transfers.");
+        }
+
+        if (rawPin == null || !passwordEncoder.matches(rawPin, sender.getTransactionPin())) {
+            throw new IllegalArgumentException("Invalid transaction PIN.");
+        }
+
+
         BankAccount from = accountRepository.findByAccountNumber(fromNum)
                 .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
         BankAccount to = accountRepository.findByAccountNumber(toNum)
