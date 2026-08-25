@@ -172,6 +172,16 @@ public class AuthService {
         return accountNumber;
     }
 
+    /**
+     * Configures a transaction PIN for a user.
+     * 
+     * @param email the email address of the user
+     * @param pin the transaction PIN to be configured
+     * @param confirmPin the confirmation of the transaction PIN
+     * @throws IllegalArgumentException if the transaction PIN is not exactly 4 digits, or if the
+     *         two transaction PINs do not match, or if the transaction PIN has already been
+     *         configured
+     */
     public void createTransactionPin(String email, String pin, String confirmPin) {
         if (pin == null || !pin.matches("\\d{4}")) {
             throw new IllegalArgumentException("Transaction PIN must be exactly 4 digits.");
