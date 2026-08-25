@@ -184,15 +184,13 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found."));
 
-        if (user.isTransactionPinBoolean()) {
+        if (user.hasTransactionPin()) {
             throw new IllegalArgumentException("Transaction PIN has already been configured.");
         }
 
         String hashedPin = passwordEncoder.encode(pin);
 
         user.setTransactionPin(hashedPin);
-
-        user.setTransactionPinBoolean(true);
 
         userRepository.save(user);
     }
