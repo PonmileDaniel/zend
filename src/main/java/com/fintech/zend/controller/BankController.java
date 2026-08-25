@@ -18,12 +18,10 @@ import com.fintech.zend.security.SessionPrincipal;
 import com.fintech.zend.service.AuthService;
 import com.fintech.zend.service.BankService;
 
-
 @RestController
 @RequestMapping("/api/accounts")
 
 public class BankController {
-    
 
     private final BankService bank;
     private final AuthService authService;
@@ -46,7 +44,8 @@ public class BankController {
         try {
             SessionPrincipal user = SecurityUtils.getCurrentUser();
             String fromAccount = user.getAccountNumber();
-            bank.transfer(fromAccount, request.getTo(), request.getAmount(), request.getDescription(), request.getPin());
+            bank.transfer(fromAccount, request.getTo(), request.getAmount(), request.getDescription(),
+                    request.getPin());
             return ResponseEntity.ok("Transfer successful");
         } catch (Exception e) {
             return ResponseEntity.badRequest()
@@ -77,9 +76,10 @@ public class BankController {
     /**
      * Creates a transaction PIN for a user.
      * 
-     * @param request the request containing the transaction PIN
+     * @param request        the request containing the transaction PIN
      * @param authentication the authentication details of the user
-     * @return a ResponseEntity containing a successful message if the transaction PIN
+     * @return a ResponseEntity containing a successful message if the transaction
+     *         PIN
      *         was created successfully, or an error message if the creation failed
      */
     @PostMapping("/transaction-pin")
@@ -93,7 +93,7 @@ public class BankController {
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
-                .body(e.getMessage());
+                    .body(e.getMessage());
         }
 
     }
