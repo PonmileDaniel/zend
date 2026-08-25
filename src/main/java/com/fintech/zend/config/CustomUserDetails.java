@@ -16,15 +16,15 @@ public class CustomUserDetails implements UserDetails {
     private final String password;
 
     public CustomUserDetails(
-        Long id,
-        String email,
-        String accountNumber,
-        String password) {
-            this.id = id;
-            this.email = email;
-            this.accountNumber = accountNumber;
-            this.password = password;
-        }
+            Long id,
+            String email,
+            String accountNumber,
+            String password) {
+        this.id = id;
+        this.email = email;
+        this.accountNumber = accountNumber;
+        this.password = password;
+    }
 
     public Long getId() {
         return id;
@@ -42,7 +42,7 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(
-            new SimpleGrantedAuthority("ROLE_USER"));
+                new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
@@ -64,9 +64,9 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    
+
     public String getEmail() {
-    return email;
+        return email;
     }
 
     @Override
