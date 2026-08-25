@@ -130,6 +130,11 @@ public class User {
         this.transactionPin = transactionPin;
     }
 
+    /**
+     * Checks if the user has a transaction PIN set.
+     * 
+     * @return true if the user has a transaction PIN set, false otherwise
+     */
     @Transient
     public boolean hasTransactionPin() {
         return this.transactionPin != null && !this.transactionPin.trim().isEmpty();
