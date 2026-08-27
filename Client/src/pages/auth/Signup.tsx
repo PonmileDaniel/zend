@@ -118,9 +118,41 @@ export default function Signup() {
                   Create account
                 </button>
               </form>
+
+              {/* Login */}
+              <div className="mt-8 border-t border-[#262626] pt-6 text-center">
+                <p className="text-sm text-[#a3a3a3]">
+                  Already have an account?{" "}
+                  <button
+                    type="button"
+                    className="text-white transition-colors hover:underline"
+                  >
+                    Log in
+                  </button>
+                </p>
+              </div>
             </div>
           </div>
+
+          {/** Footer */}
+          <footer className="flex items-center justify-between border-t border-[#262626] px-6 py-8 lg:px-12">
+            <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#666]">
+              © 2026 ZEND TECHNOLOGIES
+            </span>
+
+            <div className="hidden gap-5 md:flex">
+              <button className="text-[11px] uppercase tracking-[0.08em] text-[#666] transition-colors hover:text-white">
+                Privacy
+              </button>
+            </div>
+
+            <button className="text-[11px] uppercase tracking-[0.08em] text-[#666] transition-colors hover:text-white">
+              Terms
+            </button>
+          </footer>
         </section>
+
+        
       </div>
     </main>
   );
