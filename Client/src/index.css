@@ -12,6 +12,135 @@ body,
 }
 
 body {
+  font-family: 'Inter', sans-serif;
+}
+
+
+/* SPLASH */
+
+.splash-screen {
   background: #000;
-  font-family: Arial, Helvetica, sans-serif;
+  animation: splashBackground 1.8s ease-in-out forwards;
+}
+
+.splash-logo {
+  z-index: 2;
+  transform-origin: center;
+  animation: expandLogo 1.8s ease-in-out forwards;
+}
+
+.final-logo {
+  z-index: 3;
+  opacity: 0;
+  animation: revealLogo 1.8s ease-in-out forwards;
+  animation-delay: 1.15s;
+}
+
+
+
+.splash-logo {
+  z-index: 2;
+  transform-origin: center;
+  animation: expandLogo 1.8s ease-in-out forwards;
+}
+
+.splash-tagline {
+  z-index: 2;
+  animation: fadeTagline 1.8s ease-in-out forwards;
+}
+
+.final-logo {
+  z-index: 3;
+  opacity: 0;
+  animation: revealLogo 1.8s ease-in-out forwards;
+  animation-delay: 1.15s;
+}
+
+.final-tagline {
+  z-index: 3;
+  opacity: 0;
+  animation: revealTagline 1.8s ease-in-out forwards;
+  animation-delay: 1.15s;
+}
+
+
+@keyframes fadeTagline {
+  0% {
+    opacity: 1;
+  }
+
+  55% {
+    opacity: 1;
+  }
+
+  75% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes revealTagline {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+@keyframes splashBackground {
+  0% {
+    background: #000;
+  }
+
+  60% {
+    background: #000;
+  }
+
+  75% {
+    background: #fff;
+  }
+
+  100% {
+    background: #fff;
+  }
+}
+
+
+@keyframes expandLogo {
+  0% {
+    transform: scale(1);
+  }
+
+  55% {
+    transform: scale(1);
+  }
+
+  75% {
+    transform: scale(50);
+  }
+
+  100% {
+    transform: scale(50);
+  }
+}
+
+
+@keyframes revealLogo {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
