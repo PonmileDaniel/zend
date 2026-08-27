@@ -152,7 +152,11 @@ export default function Signup() {
           </footer>
         </section>
 
+        {/*RIGHT - VISUAL */}
+        <section className="relative hidden min-h-screen w-full overflow-hidden bg-[#0a0a0a] lg:flex lg:w-1/2">
         
+        </section>
+
       </div>
     </main>
   );
