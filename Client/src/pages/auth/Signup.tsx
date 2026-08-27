@@ -54,14 +54,69 @@ export default function Signup() {
                       id="lastName"
                       type="text"
                       placeholder="Doe"
-                      className="w-full border-0 border-b border-[#303030] bg-[#0a0a0a] px-0 py-3 text-base text-white outline-none transition-colors placeholder:text-[#555] focus:border-white"/>
+                      className="w-full border-0 border-b border-[#303030] bg-[#0a0a0a] px-0 py-3 text-base text-white outline-none transition-colors placeholder:text-[#555] focus:border-white"
+                    />
                   </div>
                 </div>
 
                 {/* Phone */}
                 <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="phone"
+                    className="text-xs font-medium uppercase tracking-[0.08em] text-[#a3a3a3]"
+                  >
+                    Phone number
+                  </label>
 
+                  <input
+                    id="phone"
+                    type="tel"
+                    placeholder="+234 800 000 0000"
+                    className="w-full border-0 border-b border-[#303030] bg-[#0a0a0a] px-0 py-3 text-base text-white outline-none transition-colors placeholder:text-[#555] focus:border-white"
+                  />
                 </div>
+
+                {/* Email */}
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="email"
+                    className="text-xs font-medium uppercase tracking-[0.08em] text-[#a3a3a3]"
+                  >
+                    Email address
+                  </label>
+
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    className="w-full border-0 border-b border-[#303030] bg-[#0a0a0a] px-0 py-3 text-base text-white outline-none transition-colors placeholder:text-[#555] focus:border-white"
+                  />
+                </div>
+
+                {/* Password */}
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="password"
+                    className="text-xs font-medium uppercase tracking-[0.08em] text-[#a3a3a3]"
+                  >
+                    Password
+                  </label>
+
+                  <input
+                    id="password"
+                    type="password"
+                    placeholder="Create a password"
+                    className="w-full border-0 border-b border-[#303030] bg-[#0a0a0a] px-0 py-3 text-base text-white outline-none transition-colors placeholder:text-[#555] focus:border-white"
+                  />
+                </div>
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  className="mt-4 w-full bg-white py-4 text-base font-semibold text-black transition-colors hover:bg-[#d9d9d9]"
+                >
+                  Create account
+                </button>
               </form>
             </div>
           </div>
