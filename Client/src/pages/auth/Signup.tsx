@@ -153,10 +153,17 @@ export default function Signup() {
         </section>
 
         {/*RIGHT - VISUAL */}
-        <section className="relative hidden min-h-screen w-full overflow-hidden bg-[#0a0a0a] lg:flex lg:w-1/2">
-        
-        </section>
+        <section className="relative hidden min-h-screen w-full overflow-hidden  lg:flex lg:w-1/2">
+          <div className="absolute inset-0">
+            <img
+              src="/src/assets/images/auth/loffy.jpeg"
+              alt="Zend financial technologies"
+              className="h-full w-full object-cover"
+            />
 
+            {/* <div className="absolute inset-0 bg-gradient-to-t from-[#131313] via-transparent to-transparent" /> */}
+          </div>
+        </section>
       </div>
     </main>
   );
