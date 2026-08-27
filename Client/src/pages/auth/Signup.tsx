@@ -158,11 +158,13 @@ export default function Signup() {
             <img
               src="/src/assets/images/auth/loffy.jpeg"
               alt="Zend financial technologies"
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover grayscale opacity-60"
             />
 
-            {/* <div className="absolute inset-0 bg-gradient-to-t from-[#131313] via-transparent to-transparent" /> */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#131313] via-transparent to-transparent" />
           </div>
+
+          
         </section>
       </div>
     </main>
