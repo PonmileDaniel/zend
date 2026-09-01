@@ -45,12 +45,13 @@ export default function Dashboard() {
         <Sidebar
           isOpen={isSidebarOpen}
           onToggle={() => setIsSidebarOpen((previous) => !previous)}
+          activeItem="Home"
         />
 
         {/* MAIN */}
         <div className="flex min-w-0 flex-1 flex-col">
           {/* HEADER */}
-          <DashboardHeader />
+          <DashboardHeader title="Home"/>
 
           {/* CONTENT */}
           <div className="flex-1 overflow-y-auto">
