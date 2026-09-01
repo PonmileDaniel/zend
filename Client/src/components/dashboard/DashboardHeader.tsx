@@ -1,18 +1,19 @@
 import { Bell, ChevronDown, Moon } from "lucide-react";
+type DashboardHeaderProps = {
+  title: string;
+}
 
-export default function DashboardHeader() {
-    return (
-        <header className="flex h-[72px] shrink-0 items-center justify-between border-b border-[#262626] bg-[#131313] px-5 lg:px-8">
+export default function DashboardHeader({ title, } : DashboardHeaderProps) {
+  return (
+    <header className="flex h-[72px] shrink-0 items-center justify-between border-b border-[#262626] bg-[#131313] px-5 lg:px-8">
       {/* Mobile Logo */}
       <div className="lg:hidden">
-        <span className="text-2xl font-extrabold tracking-[-0.08em]">
-          ZEND
-        </span>
+        <span className="text-2xl font-extrabold tracking-[-0.08em]">ZEND</span>
       </div>
 
       {/* Desktop Title */}
       <div className="hidden lg:block">
-        <h1 className="text-lg font-semibold">Home</h1>
+        <h1 className="text-lg font-semibold">{title}</h1>
       </div>
 
       {/* Right */}
@@ -47,5 +48,5 @@ export default function DashboardHeader() {
         </button>
       </div>
     </header>
-    );
+  );
 }
