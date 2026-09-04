@@ -10,10 +10,10 @@ interface AuthLayoutProps {
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
-    <main className="h-screen overflow-hidden bg-[#131313] text-white">
-      <div className="flex h-screen flex-col lg:flex-row">
+    <main className="min-h-screen bg-[#131313] text-white">
+      <div className="flex min-h-screen flex-col lg:flex-row">
         {/* LEFT */}
-        <section className="flex h-screen w-full flex-col border-b border-[#262626] lg:w-1/2 lg:border-b-0 lg:border-r">
+        <section className="flex min-h-screen w-full flex-col border-b border-[#262626] lg:w-1/2 lg:border-b-0 lg:border-r">
           <AuthHeader />
 
           {/* Page-specific content */}
