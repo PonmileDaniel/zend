@@ -4,9 +4,64 @@ import Sidebar from "../../components/dashboard/Sidebar";
 import DashboardHeader from "../../components/dashboard/DashboardHeader";
 import ThisMonth from "../../components/dashboard/ThisMonth";
 import SendMoneyForm from "../../components/Transfers/SendMoneyForm";
+import TransferPinModal from "../../components/Transfers/TransferPinModal";
+import TransferResultModal from "../../components/Transfers/TransferResultModal";
 
 export default function SendMoney() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+
+  const [isResultModalOpen, setIsResultModalOpen] = useState(false);
+
+  const [transferStatus, setTransferStatus] = useState<
+    "success" | "failed"
+  >("success");
+
+  const [transferData, setTransferData] = useState({
+    recipientName: "",
+    amount: "",
+    description: "",
+  });
+
+  const handleSendMoney = ({
+    recipientName,
+    amount,
+    description,
+  }: {
+    recipientName: string;
+    amount: string;
+    description: string;
+  }) => {
+    setTransferData({
+      recipientName,
+      amount,
+      description,
+    });
+
+    setIsPinModalOpen(true);
+  };
+
+  const handlePinConfirm = () => {
+    setIsPinModalOpen(false);
+
+    /*
+     * Temporary simulation.
+     *
+     * Later this is where the backend response
+     * will determine success or failure.
+     */
+
+    const successful = true;
+
+    setTransferStatus(successful ? "success" : "failed");
+
+    setIsResultModalOpen(true);
+  };
+
+  const handleResultClose = () => {
+    setIsResultModalOpen(false);
+  };
 
   return (
     <main className="min-h-screen bg-[#131313] text-white">
@@ -15,7 +70,9 @@ export default function SendMoney() {
 
         <Sidebar
           isOpen={isSidebarOpen}
-          onToggle={() => setIsSidebarOpen((previous) => !previous)}
+          onToggle={() =>
+            setIsSidebarOpen((previous) => !previous)
+          }
           activeItem="Send"
         />
 
@@ -34,7 +91,7 @@ export default function SendMoney() {
                 {/* LEFT */}
 
                 <div className="min-w-0">
-                  {/* Page Heading */}
+                  {/* PAGE HEADING */}
 
                   <div className="mb-6">
                     <h1 className="text-2xl font-semibold tracking-tight">
@@ -46,11 +103,12 @@ export default function SendMoney() {
                     </p>
                   </div>
 
-                  {/* Transfer Form */}
+                  {/* TRANSFER FORM */}
 
                   <SendMoneyForm
                     recipientName="Daniel Ihenychukwu Ndukwe"
                     accountNumber="2919144394"
+                    onSend={handleSendMoney}
                   />
                 </div>
 
@@ -64,6 +122,28 @@ export default function SendMoney() {
           </div>
         </div>
       </div>
+
+      {/* PIN MODAL */}
+
+      <TransferPinModal
+        isOpen={isPinModalOpen}
+        onClose={() => setIsPinModalOpen(false)}
+        recipientName={transferData.recipientName}
+        amount={transferData.amount}
+        description={transferData.description}
+        onConfirm={handlePinConfirm}
+      />
+
+      {/* RESULT MODAL */}
+
+      <TransferResultModal
+        isOpen={isResultModalOpen}
+        status={transferStatus}
+        onClose={handleResultClose}
+        recipientName={transferData.recipientName}
+        amount={transferData.amount}
+        description={transferData.description}
+      />
     </main>
   );
 }
