@@ -8,6 +8,7 @@ import {
 type TransferProps = {
   recipientName: string;
   accountNumber: string;
+  onSend: (data: { recipientName: string; amount: string, description: string}) => void;
 };
 
 type PreviousTransfer = {
@@ -41,16 +42,19 @@ const previousTransfers: PreviousTransfer[] = [
 export default function SendMoneyForm({
   recipientName,
   accountNumber,
+  onSend,
 }: TransferProps) {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
 
+  /*
+   * Handle amount
+   */
   const handleAmountChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = event.target.value;
 
-    // Only allow numbers and decimal point
     if (!/^\d*\.?\d*$/.test(value)) {
       return;
     }
@@ -58,24 +62,38 @@ export default function SendMoneyForm({
     setAmount(value);
   };
 
+
+  /*
+   * Handle description
+   */
   const handleDescriptionChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setDescription(event.target.value.slice(0, 30));
+    setDescription(
+      event.target.value.slice(0, 30),
+    );
   };
 
+
+  /*
+   * Submit transfer form
+   *
+   * This does NOT transfer money yet.
+   *
+   * It simply opens the PIN confirmation modal.
+   */
   const handleSubmit = (
-    event: React.FormEvent<HTMLFormElement>
+    event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
 
-    console.log({
-      recipientName,
-      accountNumber,
-      amount,
-      description,
-    });
+    if (!amount) {
+      return;
+    }
+
+    onSend({amount, description, recipientName});
   };
+
 
   return (
     <div className="space-y-8">
@@ -87,6 +105,7 @@ export default function SendMoneyForm({
       <section className="border border-[#303030] bg-[#1A181A]">
 
         {/* Recipient */}
+
         <div className="border-b border-[#303030] px-5 py-5">
 
           <p className="text-xs uppercase tracking-[0.08em] text-[#777]">
@@ -109,9 +128,11 @@ export default function SendMoneyForm({
 
 
         {/* Form */}
+
         <form onSubmit={handleSubmit}>
 
           {/* Amount */}
+
           <div className="border-b border-[#303030] px-5 py-6">
 
             <label
@@ -144,6 +165,7 @@ export default function SendMoneyForm({
 
 
           {/* Description */}
+
           <div className="px-5 py-6">
 
             <div className="flex items-center justify-between">
@@ -176,6 +198,7 @@ export default function SendMoneyForm({
 
 
           {/* Send */}
+
           <div className="border-t border-[#303030] px-5 py-4">
 
             <button
@@ -183,9 +206,11 @@ export default function SendMoneyForm({
               disabled={!amount}
               className="flex w-full items-center justify-center gap-2 bg-white py-3.5 text-sm font-semibold text-black transition-colors hover:bg-[#d9d9d9] disabled:cursor-not-allowed disabled:opacity-40"
             >
+
               <Send size={16} />
 
               Send money
+
             </button>
 
           </div>
@@ -219,65 +244,74 @@ export default function SendMoneyForm({
 
         <div className="border border-[#262626] bg-[#1A181A]">
 
-          {previousTransfers.map((transfer, index) => (
-            <div
-              key={`${transfer.accountNumber}-${index}`}
-              className="flex items-center justify-between border-b border-[#262626] px-4 py-4 last:border-b-0"
-            >
+          {previousTransfers.map(
+            (transfer, index) => (
+              <div
+                key={`${transfer.accountNumber}-${index}`}
+                className="flex items-center justify-between border-b border-[#262626] px-4 py-4 last:border-b-0"
+              >
 
-              {/* Left */}
-              <div className="flex min-w-0 items-center gap-3">
+                {/* Left */}
 
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-[#303030] bg-[#0A0A0A]">
+                <div className="flex min-w-0 items-center gap-3">
 
-                  {transfer.type === "received" ? (
-                    <ArrowDownLeft
-                      size={17}
-                      className="text-[#35CF8A]"
-                    />
-                  ) : (
-                    <ArrowUpRight
-                      size={17}
-                      className="text-[#aaa]"
-                    />
-                  )}
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-[#303030] bg-[#0A0A0A]">
+
+                    {transfer.type === "received" ? (
+                      <ArrowDownLeft
+                        size={17}
+                        className="text-[#35CF8A]"
+                      />
+                    ) : (
+                      <ArrowUpRight
+                        size={17}
+                        className="text-[#aaa]"
+                      />
+                    )}
+
+                  </div>
+
+
+                  <div className="min-w-0">
+
+                    <p className="truncate text-sm font-medium">
+                      {transfer.name}
+                    </p>
+
+                    <p className="mt-1 font-mono text-xs text-[#666]">
+                      {transfer.accountNumber}
+                    </p>
+
+                  </div>
 
                 </div>
 
 
-                <div className="min-w-0">
+                {/* Amount */}
 
-                  <p className="truncate text-sm font-medium">
-                    {transfer.name}
-                  </p>
+                <div className="ml-4 shrink-0 text-right">
 
-                  <p className="mt-1 font-mono text-xs text-[#666]">
-                    {transfer.accountNumber}
+                  <p
+                    className={`text-sm font-semibold ${
+                      transfer.type === "received"
+                        ? "text-[#35CF8A]"
+                        : "text-white"
+                    }`}
+                  >
+                    {transfer.type === "received"
+                      ? "+"
+                      : "-"}{" "}
+                    {transfer.amount.replace(
+                      "+ ",
+                      "",
+                    )}
                   </p>
 
                 </div>
 
               </div>
-
-
-              {/* Amount */}
-              <div className="ml-4 shrink-0 text-right">
-
-                <p
-                  className={`text-sm font-semibold ${
-                    transfer.type === "received"
-                      ? "text-[#35CF8A]"
-                      : "text-white"
-                  }`}
-                >
-                  {transfer.type === "received" ? "+" : "-"}{" "}
-                  {transfer.amount.replace("+ ", "")}
-                </p>
-
-              </div>
-
-            </div>
-          ))}
+            ),
+          )}
 
         </div>
 
