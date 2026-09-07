@@ -9,7 +9,7 @@ export const signupSchema = z.object({
   lastName: z
     .string()
     .trim()
-    .min(3, "First name must be at least 3 characters"),
+    .min(3, "Last name must be at least 3 characters"),
 
   phone: z.string().trim().min(10, "Enter a valid phone number"),
 
