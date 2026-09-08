@@ -38,6 +38,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private boolean verified = false;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "bank_account_id")
     private BankAccount bankAccount;
