@@ -6,6 +6,7 @@ import {
   signupSchema,
   type SignupFormData,
 } from "../../schemas/auth/signupSchema";
+import { signup } from "../../services/authApi";
 
 type SignupErrors = Partial<Record<keyof SignupFormData, string>>;
 
@@ -20,7 +21,8 @@ export default function Signup() {
   });
 
   const [errors, setErrors] = useState<SignupErrors>({});
-  const [isSubmitting, setIsSubmiting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState("");
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
@@ -61,12 +63,22 @@ export default function Signup() {
     }
 
     setErrors({});
-    setIsSubmiting(true);
+    setServerError("");
+    setIsSubmitting(true);
 
     try {
-      console.log("Valid signup data:", result.data);
+      const response = await signup(result.data);
+
+      console.log("Valid signup data:", response);
+      navigate("/otp");
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Something went wronf. Please try again.";
+      console.error("Signup failed:", message);
     } finally {
-      setIsSubmiting(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -86,6 +98,11 @@ export default function Signup() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {serverError && (
+            <div className="mb-4 border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+              {serverError}
+            </div>
+          )}
           {/* First + Last Name */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* First Name */}
@@ -203,9 +220,7 @@ export default function Signup() {
               }`}
             />
             {errors.password && (
-              <p className="text-xs text-red-400">
-                {errors.password}
-              </p>
+              <p className="text-xs text-red-400">{errors.password}</p>
             )}
           </div>
 
