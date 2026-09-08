@@ -15,7 +15,7 @@ export default function Signup() {
   const [form, setForm] = useState<SignupFormData>({
     firstName: "",
     lastName: "",
-    phone: "",
+    phoneNumber: "",
     email: "",
     password: "",
   });
@@ -165,14 +165,14 @@ export default function Signup() {
             </label>
 
             <input
-              id="phone"
+              id="phoneNumber"
               type="tel"
-              value={form.phone}
+              value={form.phoneNumber}
               onChange={handleChange}
               placeholder="+234 800 000 0000"
               autoComplete="tel"
               className={`w-full border-0 border-b bg-[#0a0a0a] px-0 py-2.5 text-base text-white outline-none transition-colors placeholder:text-[#555] focus:border-white ${
-                errors.phone ? "border-red-500" : "border-[#303030]"
+                errors.phoneNumber ? "border-red-500" : "border-[#303030]"
               }`}
             />
           </div>
