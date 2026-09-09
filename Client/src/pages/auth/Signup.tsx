@@ -77,6 +77,7 @@ export default function Signup() {
           ? error.message
           : "Something went wronf. Please try again.";
       console.error("Signup failed:", message);
+      setServerError(message);
     } finally {
       setIsSubmitting(false);
     }
