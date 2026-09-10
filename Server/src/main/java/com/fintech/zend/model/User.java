@@ -1,6 +1,6 @@
 package com.fintech.zend.model;
 
-import java.beans.Transient;
+import jakarta.persistence.Transient;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -63,6 +63,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.bankAccount = bankAccount;
+        
     }
 
     public Long getId() {
@@ -115,6 +116,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
     }
 
     public BankAccount getBankAccount() {
