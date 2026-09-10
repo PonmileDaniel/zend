@@ -26,6 +26,6 @@ public class EmailService {
                         + "\n\n"
                         + "If you did not create a ZEND account, please ignore this email."
         );
-        mailSender.send(message)
+        mailSender.send(message);
     }
 }
