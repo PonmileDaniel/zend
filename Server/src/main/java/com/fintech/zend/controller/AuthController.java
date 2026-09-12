@@ -2,20 +2,23 @@ package com.fintech.zend.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.security.core.Authentication;
-import jakarta.servlet.http.HttpServletRequest;
 
 import com.fintech.zend.dto.LoginRequest;
 import com.fintech.zend.dto.LoginResponse;
+import com.fintech.zend.dto.OtpResponse;
 import com.fintech.zend.dto.SignupRequest;
 import com.fintech.zend.dto.SignupResponse;
-import com.fintech.zend.service.AuthService;
 import com.fintech.zend.dto.TransactionPinRequest;
+import com.fintech.zend.dto.VerifyOtpRequest;
 import com.fintech.zend.security.SessionPrincipal;
+import com.fintech.zend.service.AuthService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -61,9 +64,6 @@ public class AuthController {
 
         try {
             LoginResponse response = authService.login(request, httpRequest);
-            // authService.login(
-            // request.getemailorAccountNumber(),
-            // request.getPassword());
             return ResponseEntity.ok(response);
 
             // return ResponseEntity.ok(new LoginResponse("Login successful."));
@@ -71,6 +71,19 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new LoginResponse(e.getMessage()));
         }
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<OtpResponse> verifyOtp(@RequestBody VerifyOtpRequest request,
+        HttpServletRequest httpRequest) {
+
+            try {
+                authService.verifyOtp(request.getEmail(), request.getOtp(), httpRequest);
+                return ResponseEntity.ok(new OtpResponse("Account verified successfully."));
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body(new OtpResponse(e.getMessage()));
+            }
+
     }
 
     /**
