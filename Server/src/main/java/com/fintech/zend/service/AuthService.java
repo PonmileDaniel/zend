@@ -31,6 +31,7 @@ import jakarta.servlet.http.HttpSession;
 @Service
 public class AuthService {
 
+    private final CustomUserDetailsService customUserDetailsService;
     private final UserRepository userRepository;
     private final BankAccountRepository accountRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -41,13 +42,15 @@ public class AuthService {
 
     public AuthService(UserRepository userRepository, BankAccountRepository accountRepository,
             BCryptPasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
-            StringRedisTemplate redisTemplate, EmailService emailService) {
+            StringRedisTemplate redisTemplate, EmailService emailService,
+            CustomUserDetailsService customUserDetailsService) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.redisTemplate = redisTemplate;
         this.emailService = emailService;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     /**
@@ -259,8 +262,15 @@ public class AuthService {
         user.setVerified(true);
         userRepository.save(user);
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getEmail(), null));
+        CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService
+                .loadUserByUsername(user.getEmail());
+
+        SessionPrincipal principal = new SessionPrincipal(
+                userDetails.getId(),
+                userDetails.getEmail(),
+                userDetails.getAccountNumber());
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
 
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(authentication);
