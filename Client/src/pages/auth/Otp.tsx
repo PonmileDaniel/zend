@@ -1,8 +1,14 @@
 import { useRef, useState } from "react";
 import AuthLayout from "../../layouts/AuthLayout";
+import { verifyOtp } from "../../services/authApi";
+import { useNavigate } from "react-router-dom";
 
 export default function Otp() {
+  const navigate = useNavigate();
   const [otp, setOtp] = useState<string[]>(["", "", "", "", ""]);
+  const [error, setErrors] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const email = sessionStorage.getItem("signupEmail");
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -88,14 +94,42 @@ export default function Otp() {
   /*
    * Verify OTP
    */
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    setErrors("");
 
     const enteredOtp = otp.join("");
 
-    console.log("OTP:", enteredOtp);
+    if (enteredOtp.length !== 5) {
+      setErrors("Please enter the 5-digit verification code.");
+      return;
+    }
 
-    // Backend verification will go here later
+    if (!email) {
+      setErrors(
+        "We couldn't determine the account being verified. Please sign up again.",
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await verifyOtp(email, enteredOtp);
+
+      // OTP is no longer needed after successful verification
+      sessionStorage.removeItem("signupEmail");
+      navigate("/dashboard");
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to verify your account.";
+      setErrors(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -115,6 +149,12 @@ export default function Otp() {
 
         {/* OTP Form */}
         <form onSubmit={handleSubmit}>
+          {/* Error message */}
+          {error && (
+            <div className="mb-5 border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+              {error}
+            </div>
+          )}
           {/* OTP Inputs */}
           <div className="flex gap-3">
             {otp.map((digit, index) => (
@@ -140,9 +180,10 @@ export default function Otp() {
           {/* Verify */}
           <button
             type="submit"
-            className="mt-7 w-full bg-white py-3.5 text-base font-semibold text-black transition-colors hover:bg-[#d9d9d9]"
+            className="mt-7 w-full bg-white py-3.5 text-base font-semibold text-black transition-colors hover:bg-[#d9d9d9] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Verify account
+            {isSubmitting ? "Verifying..." : "Verify account"}
+
           </button>
         </form>
 
