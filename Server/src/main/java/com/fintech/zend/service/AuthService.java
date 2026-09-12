@@ -270,7 +270,8 @@ public class AuthService {
                 userDetails.getEmail(),
                 userDetails.getAccountNumber());
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null,
+                principal.getAuthorities());
 
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(authentication);
@@ -278,6 +279,38 @@ public class AuthService {
         request.getSession(true).setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 securityContext);
+    }
 
+    public void resendOtp(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+
+        if (user.isVerified()) {
+            throw new IllegalArgumentException("Account is already verified.");
+        }
+
+        String cooldownKey = "otp:resend-cooldown:" + email;
+        Boolean cooldownExists = redisTemplate.hasKey(cooldownKey);
+        if (Boolean.TRUE.equals(cooldownExists)) {
+            throw new IllegalArgumentException(
+                "Please wait 60 seconds before requesting another OTP.");
+        }
+        String otp = generateOtp();
+        String otpKey = "otp:signup:" + email;
+        
+        // Replace the exisiting OTP and reset its 5 minutes expiration
+        redisTemplate.opsForValue().set(
+            otpKey,
+            otp,
+            5,
+            TimeUnit.MINUTES
+        );
+        // Prevent another resend for 60 seconds
+        redisTemplate.opsForValue().set(
+            cooldownKey,
+            "1",
+            60,
+            TimeUnit.SECONDS);
+        emailService.sendOtp(email, otp);        
     }
 }
