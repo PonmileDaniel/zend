@@ -5,9 +5,11 @@ export interface SignupResponse {
   message: string;
 }
 
-export async function signup(
-  data: SignupFormData,
-): Promise<SignupResponse> {
+export interface VerifyOtpResponse {
+  message: string;
+}
+
+export async function signup(data: SignupFormData): Promise<SignupResponse> {
   const response = await fetch(`${API_URL}/api/auth/signup`, {
     method: "POST",
     headers: {
@@ -22,5 +24,29 @@ export async function signup(
     throw new Error(result.message || "Unable to create account");
   }
 
+  return result;
+}
+
+export async function verifyOtp(
+  email: string,
+  otp: string,
+): Promise<VerifyOtpResponse> {
+  const response = await fetch(`${API_URL}/api/auth/verify-otp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      otp,
+    }),
+    credentials: "include",
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Invalid verification code");
+  }
   return result;
 }
