@@ -37,15 +37,17 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final SecureRandom random = new SecureRandom();
     private final StringRedisTemplate redisTemplate;
-    
+    private final EmailService emailService;
 
     public AuthService(UserRepository userRepository, BankAccountRepository accountRepository,
-            BCryptPasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, StringRedisTemplate redisTemplate) {
+            BCryptPasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
+            StringRedisTemplate redisTemplate, EmailService emailService) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.redisTemplate = redisTemplate;
+        this.emailService = emailService;
     }
 
     /**
@@ -87,15 +89,14 @@ public class AuthService {
         String otp = generateOtp();
 
         String redisKey = "otp:signup:" + request.getEmail();
-        
-        redisTemplate.opsForValue().set(
-            redisKey,
-            otp,
-            5,
-            TimeUnit.MINUTES
-        );
 
-        System.out.println("OTP for " + request.getEmail() + ": " + otp);
+        redisTemplate.opsForValue().set(
+                redisKey,
+                otp,
+                5,
+                TimeUnit.MINUTES);
+
+        emailService.sendOtp(request.getEmail(), otp);
 
         return new SignupResponse(
                 "User Registered Successfully",
@@ -228,5 +229,45 @@ public class AuthService {
         user.setTransactionPin(hashedPin);
 
         userRepository.save(user);
+    }
+
+    public void verifyOtp(String email, String otp, HttpServletRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+
+        if (user.isVerified()) {
+            throw new IllegalArgumentException("Account is already verified.");
+        }
+
+        String redisKey = "otp:signup:" + email;
+
+        String storedOtp = redisTemplate.opsForValue().get(redisKey);
+
+        if (storedOtp == null) {
+            throw new IllegalArgumentException(
+                    "OTP has expired. Please request a new code.");
+        }
+
+        if (!storedOtp.equals(otp)) {
+            throw new IllegalArgumentException("Invalid OTP.");
+        }
+
+        // OTP is correct
+        redisTemplate.delete(redisKey);
+
+        // Mark account as verified
+        user.setVerified(true);
+        userRepository.save(user);
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getEmail(), null));
+
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        request.getSession(true).setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                securityContext);
+
     }
 }
