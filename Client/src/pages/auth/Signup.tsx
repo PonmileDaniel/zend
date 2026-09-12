@@ -6,7 +6,7 @@ import {
   signupSchema,
   type SignupFormData,
 } from "../../schemas/auth/signupSchema";
-import { signup } from "../../services/authApi";
+// import { signup } from "../../services/authApi";
 
 type SignupErrors = Partial<Record<keyof SignupFormData, string>>;
 
@@ -67,9 +67,10 @@ export default function Signup() {
     setIsSubmitting(true);
 
     try {
-      const response = await signup(result.data);
+      // const response = await signup(result.data);
+      sessionStorage.setItem("signupEmail", result.data.email);
 
-      console.log("Valid signup data:", response);
+      // console.log("Valid signup data:", response);
       navigate("/otp");
     } catch (error) {
       const message =
