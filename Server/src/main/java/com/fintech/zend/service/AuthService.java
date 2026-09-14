@@ -26,7 +26,7 @@ import com.fintech.zend.repository.UserRepository;
 import com.fintech.zend.security.SessionPrincipal;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+// import jakarta.servlet.http.HttpSession;
 
 @Service
 public class AuthService {
