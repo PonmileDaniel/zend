@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import AuthLayout from "../../layouts/AuthLayout";
-import { verifyOtp } from "../../services/authApi";
+import { verifyOtp, resendOtp } from "../../services/authApi";
 import { useNavigate } from "react-router-dom";
 
 export default function Otp() {
@@ -8,9 +8,24 @@ export default function Otp() {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", ""]);
   const [error, setErrors] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendMessage, setResendMessage] = useState("");
+
   const email = sessionStorage.getItem("signupEmail");
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Cooldown
+  useEffect(() => {
+    if (resendCooldown <= 0) {
+      return;
+    }
+    const timer = setInterval(() => {
+      setResendCooldown((previous) => previous - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   /*
    * Handle OTP input
@@ -132,6 +147,39 @@ export default function Otp() {
     }
   };
 
+  const handleResendOtp = async () => {
+    if (!email) {
+      setErrors(
+        "We couldn't determine the account being verified. Please sign up again.",
+      );
+      return;
+    }
+    if (resendCooldown > 0 || isResending) {
+      return;
+    }
+    setErrors("");
+    setResendMessage("");
+    setIsResending(true);
+
+    try {
+      await resendOtp(email);
+
+      setOtp(["", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
+
+      setResendMessage("A new verification code has been sent.");
+      setResendCooldown(60);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to resend verificatio code.";
+      setErrors(message);
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   return (
     <AuthLayout>
       <div className="w-full max-w-md">
@@ -183,19 +231,27 @@ export default function Otp() {
             className="mt-7 w-full bg-white py-3.5 text-base font-semibold text-black transition-colors hover:bg-[#d9d9d9] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? "Verifying..." : "Verify account"}
-
           </button>
         </form>
 
         {/* Resend */}
         <div className="mt-6 text-center">
+          {resendMessage && (
+            <p className="mb-2 text-sm text-green-400">{resendMessage}</p>
+          )}
           <p className="text-sm text-[#777]">
             Didn't receive the code?{" "}
             <button
               type="button"
-              className="text-white transition-colors hover:underline"
+              onClick={handleResendOtp}
+              disabled={isResending || resendCooldown > 0}
+              className="text-white transition-colors hover:underline disabled:cursor-not-allowed disabled:text-[#555] disabled:no-underline"
             >
-              Resend OTP
+              {isResending
+                ? "Sending..."
+                : resendCooldown > 0
+                  ? `Resend OTP in ${resendCooldown}s`
+                  : "Resend OTP"}
             </button>
           </p>
         </div>
