@@ -9,6 +9,11 @@ export interface VerifyOtpResponse {
   message: string;
 }
 
+export interface OtpResponse {
+  message: string;
+}
+
+
 export async function signup(data: SignupFormData): Promise<SignupResponse> {
   const response = await fetch(`${API_URL}/api/auth/signup`, {
     method: "POST",
@@ -47,6 +52,25 @@ export async function verifyOtp(
 
   if (!response.ok) {
     throw new Error(result.message || "Invalid verification code");
+  }
+  return result;
+}
+
+export async function resendOtp(email: string): Promise<OtpResponse> {
+  const response = await fetch(`${API_URL}/api/auth/resend-otp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+    }),
+    credentials: "include",
+  });
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Unable to resend verification code");
   }
   return result;
 }
