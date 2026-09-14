@@ -86,6 +86,18 @@ public class AuthController {
 
     }
 
+    @PostMapping("/resend-otp")
+    public ResponseEntity<OtpResponse> resendOtp(@RequestBody VerifyOtpRequest request) {
+
+            try {
+                authService.resendOtp(request.getEmail());
+                return ResponseEntity.ok(new OtpResponse("A new Verification code has been sent."));
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body(new OtpResponse(e.getMessage()));
+            }
+
+    }
+
     /**
      * Creates a transaction PIN for a user.
      * 
