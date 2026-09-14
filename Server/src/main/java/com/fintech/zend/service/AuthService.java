@@ -90,12 +90,13 @@ public class AuthService {
         userRepository.save(user);
 
         String otp = generateOtp();
+        String hashedOtp = passwordEncoder.encode(otp);
 
         String redisKey = "otp:signup:" + request.getEmail();
 
         redisTemplate.opsForValue().set(
                 redisKey,
-                otp,
+                hashedOtp,
                 5,
                 TimeUnit.MINUTES);
 
@@ -118,30 +119,22 @@ public class AuthService {
      * @throws IllegalArgumentException if the email or account number and password
      *                                  are invalid
      */
-    public LoginResponse login(LoginRequest request, HttpServletRequest servletRequest) {
+    public LoginResponse login(LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getemailorAccountNumber(), request.getPassword()));
 
             CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
 
-            SessionPrincipal principal = new SessionPrincipal(user.getId(), user.getEmail(),
-                    user.getAccountNumber());
+            String otp = generateOtp();
+            String hashedOtp = passwordEncoder.encode(otp);
+            // Stored hashed otp in Redis
+            String redisKey = "otp:login" + user.getEmail();
+            redisTemplate.opsForValue().set(redisKey, hashedOtp, 5, TimeUnit.MINUTES);
 
-            Authentication sessionAuthentication = new UsernamePasswordAuthenticationToken(principal, null,
-                    principal.getAuthorities());
-
-            SecurityContext context = SecurityContextHolder.createEmptyContext();
-            context.setAuthentication(sessionAuthentication);
-            SecurityContextHolder.setContext(context);
-
-            HttpSession session = servletRequest.getSession(true);
-
-            session.setAttribute(
-                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                    context);
-
-            return new LoginResponse("Login Successful");
+            // Send otp
+            emailService.sendOtp(user.getEmail(), otp);
+            return new LoginResponse("Verification code sent to your registered email.");
         } catch (BadCredentialsException e) {
             throw new IllegalArgumentException("Invalid credentials");
 
@@ -234,6 +227,19 @@ public class AuthService {
         userRepository.save(user);
     }
 
+    /**
+     * Verifies a user's account using an OTP sent to their registered email
+     * address.
+     * 
+     * @param email   the email address of the user
+     * @param otp     the OTP sent to the user's email address
+     * @param request the HTTP request used to verify the user
+     * @throws IllegalArgumentException if the user is not found, or if the account
+     *                                  is
+     *                                  already verified, or if the OTP has expired,
+     *                                  or if the OTP is
+     *                                  invalid
+     */
     public void verifyOtp(String email, String otp, HttpServletRequest request) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found."));
@@ -251,7 +257,7 @@ public class AuthService {
                     "OTP has expired. Please request a new code.");
         }
 
-        if (!storedOtp.equals(otp)) {
+        if (!passwordEncoder.matches(otp, storedOtp)) {
             throw new IllegalArgumentException("Invalid OTP.");
         }
 
@@ -281,6 +287,69 @@ public class AuthService {
                 securityContext);
     }
 
+    /**
+     * Verifies a login OTP for a user.
+     * 
+     * @param email the email address of the user
+     * @param otp the OTP to be verified
+     * @param request the HTTP request used to verify the OTP
+     * @throws IllegalArgumentException if the user is not found, or if the OTP has expired,
+     *                                  or if the OTP is invalid
+     */
+    public void verifyLoginOtp(String email, String otp, HttpServletRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+        String redisKey = "otp:login:" + email;
+
+        String storedHashedOtp = redisTemplate.opsForValue().get(redisKey);
+
+        if (storedHashedOtp == null) {
+            throw new IllegalArgumentException(
+                    "OTP has expired. Please request a new code.");
+        }
+
+        if (!passwordEncoder.matches(otp, storedHashedOtp)) {
+            throw new IllegalArgumentException("Invalid OTP.");
+        }
+
+        // OTP is correct, so delete it.
+        redisTemplate.delete(redisKey);
+
+        CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService
+                .loadUserByUsername(user.getEmail());
+
+        SessionPrincipal principal = new SessionPrincipal(
+                userDetails.getId(),
+                userDetails.getEmail(),
+                userDetails.getAccountNumber());
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                principal,
+                null,
+                principal.getAuthorities());
+
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(authentication);
+
+        SecurityContextHolder.setContext(securityContext);
+
+        request.getSession(true).setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                securityContext);
+
+    }
+
+    /**
+     * Resends an OTP to a user's registered email address.
+     * 
+     * @param email the email address of the user
+     * @throws IllegalArgumentException if the user is not found, or if the account
+     *                                  is
+     *                                  already verified, or if the 60 seconds
+     *                                  cooldown has not
+     *                                  expired
+     */
     public void resendOtp(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found."));
@@ -293,24 +362,24 @@ public class AuthService {
         Boolean cooldownExists = redisTemplate.hasKey(cooldownKey);
         if (Boolean.TRUE.equals(cooldownExists)) {
             throw new IllegalArgumentException(
-                "Please wait 60 seconds before requesting another OTP.");
+                    "Please wait 60 seconds before requesting another OTP.");
         }
         String otp = generateOtp();
+        String hashedOtp = passwordEncoder.encode(otp);
         String otpKey = "otp:signup:" + email;
-        
+
         // Replace the exisiting OTP and reset its 5 minutes expiration
         redisTemplate.opsForValue().set(
-            otpKey,
-            otp,
-            5,
-            TimeUnit.MINUTES
-        );
+                otpKey,
+                hashedOtp,
+                5,
+                TimeUnit.MINUTES);
         // Prevent another resend for 60 seconds
         redisTemplate.opsForValue().set(
-            cooldownKey,
-            "1",
-            60,
-            TimeUnit.SECONDS);
-        emailService.sendOtp(email, otp);        
+                cooldownKey,
+                "1",
+                60,
+                TimeUnit.SECONDS);
+        emailService.sendOtp(email, otp);
     }
 }
