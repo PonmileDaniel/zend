@@ -13,9 +13,13 @@ export interface OtpResponse {
   message: string;
 }
 
+export interface LoginResponse {
+  message: string;
+  email: string;
+}
 
 export async function signup(data: SignupFormData): Promise<SignupResponse> {
-  const response = await fetch(`${API_URL}/api/auth/signup`, {
+  const response = await fetch(`${API_URL}/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -36,7 +40,7 @@ export async function verifyOtp(
   email: string,
   otp: string,
 ): Promise<VerifyOtpResponse> {
-  const response = await fetch(`${API_URL}/api/auth/verify-otp`, {
+  const response = await fetch(`${API_URL}/verify-otp`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -57,7 +61,7 @@ export async function verifyOtp(
 }
 
 export async function resendOtp(email: string): Promise<OtpResponse> {
-  const response = await fetch(`${API_URL}/api/auth/resend-otp`, {
+  const response = await fetch(`${API_URL}/resend-otp`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -72,5 +76,28 @@ export async function resendOtp(email: string): Promise<OtpResponse> {
   if (!response.ok) {
     throw new Error(result.message || "Unable to resend verification code");
   }
+  return result;
+}
+
+export async function login(
+  emailorAccountNumber: string,
+  password: string,
+): Promise<LoginResponse> {
+  const response = await fetch(`${API_URL}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      emailorAccountNumber,
+      password,
+    })
+  });
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Unable to login");
+  }
+
   return result;
 }
