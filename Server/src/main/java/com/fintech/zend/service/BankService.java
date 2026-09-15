@@ -63,7 +63,6 @@ public class BankService {
             throw new IllegalArgumentException("Invalid transaction PIN.");
         }
 
-
         BankAccount from = accountRepository.findByAccountNumber(fromNum)
                 .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
         BankAccount to = accountRepository.findByAccountNumber(toNum)

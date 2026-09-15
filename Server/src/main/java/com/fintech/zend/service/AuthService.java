@@ -382,4 +382,33 @@ public class AuthService {
                 TimeUnit.SECONDS);
         emailService.sendOtp(email, otp);
     }
+
+
+    public void resendLoginOtp(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        String cooldownKey = "otp:login:resend-cooldown:" + email;
+        Boolean cooldownExists = redisTemplate.hasKey(cooldownKey);
+
+        if (Boolean.TRUE.equals(cooldownExists)) {
+            throw new IllegalArgumentException("Please wait 60 seconds before requesting another OTP.");
+        }
+        String otp = generateOtp();
+        String hashedOtp = passwordEncoder.encode(otp);
+        String otpKey = "otp:login:" + email;
+        redisTemplate.opsForValue().set(
+            otpKey,
+            hashedOtp,
+            5,
+            TimeUnit.MINUTES
+        );
+
+        // Prevent another resend for 60 seconds.
+        redisTemplate.opsForValue().set(
+            cooldownKey,
+            "1",
+            60,
+            TimeUnit.SECONDS
+        );
+        emailService.sendOtp(email, otp);
+    }
 }
