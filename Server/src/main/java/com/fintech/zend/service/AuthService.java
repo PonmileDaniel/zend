@@ -168,31 +168,6 @@ public class AuthService {
     }
 
     /**
-     * Generates a unique account number for a user.
-     * The generated account number is in the format of a 10-digit number between
-     * 1,000,000,000 and 9,999,999,999.
-     * The account number is guaranteed to be unique by checking against the
-     * existing account numbers in the database.
-     * 
-     * @return a unique account number for the user
-     */
-    public String generateAccountNumber() {
-        String accountNumber;
-
-        do {
-            long number = 1_000_000_000L + (long) (random.nextDouble() * 9_000_000_000L);
-            accountNumber = String.valueOf(number);
-
-        } while (accountRepository.findByAccountNumber(accountNumber).isPresent());
-        return accountNumber;
-    }
-
-    private String generateOtp() {
-        int otp = 10000 + random.nextInt(90000);
-        return String.valueOf(otp);
-    }
-
-    /**
      * Configures a transaction PIN for a user.
      * 
      * @param email      the email address of the user
@@ -385,7 +360,7 @@ public class AuthService {
 
 
     public void resendLoginOtp(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        // User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
         String cooldownKey = "otp:login:resend-cooldown:" + email;
         Boolean cooldownExists = redisTemplate.hasKey(cooldownKey);
 
@@ -410,5 +385,46 @@ public class AuthService {
             TimeUnit.SECONDS
         );
         emailService.sendOtp(email, otp);
+    }
+
+
+    /**
+     * Generates a unique account number for a user.
+     * The generated account number is in the format of a 10-digit number between
+     * 1,000,000,000 and 9,999,999,999.
+     * The account number is guaranteed to be unique by checking against the
+     * existing account numbers in the database.
+     * 
+     * @return a unique account number for the user
+     */
+    public String generateAccountNumber() {
+        String accountNumber;
+
+        do {
+            long number = 1_000_000_000L + (long) (random.nextDouble() * 9_000_000_000L);
+            accountNumber = String.valueOf(number);
+
+        } while (accountRepository.findByAccountNumber(accountNumber).isPresent());
+        return accountNumber;
+    }
+
+    private String generateOtp() {
+        int otp = 10000 + random.nextInt(90000);
+        return String.valueOf(otp);
+    }
+
+    private String maskEmail(String email) {
+        String[] parts = email.split("@");
+
+        if (parts.length != 2) {
+            return email;
+        }
+        String username = parts[0];
+        String domain = parts[1];
+
+        if (username.length() <= 2){
+            return username.charAt(0) + "****@" + domain;
+        }
+        return username.substring(0, 2) + "****@" + domain;
     }
 }
