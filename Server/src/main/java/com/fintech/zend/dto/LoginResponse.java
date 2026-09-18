@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LoginResponse {
 
-    private String message;
+    private final String message;
     private String challengeId;
     private String maskedEmail;
 
