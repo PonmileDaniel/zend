@@ -91,7 +91,7 @@ export async function login(
     body: JSON.stringify({
       emailorAccountNumber,
       password,
-    })
+    }),
   });
   const result = await response.json();
 
@@ -99,5 +99,48 @@ export async function login(
     throw new Error(result.message || "Unable to login");
   }
 
+  return result;
+}
+
+export async function loginOtp(
+  email: string,
+  otp: string,
+): Promise<VerifyOtpResponse> {
+  const response = await fetch(`${API_URL}/verify-login-otp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      otp,
+    }),
+    credentials: "include",
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Invalid verification code");
+  }
+  return result;
+}
+
+export async function resendloginOtp(email: string): Promise<OtpResponse> {
+  const response = await fetch(`${API_URL}/resend-login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+    }),
+    credentials: "include",
+  });
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Unable to resend verification code");
+  }
   return result;
 }
