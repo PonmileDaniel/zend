@@ -5,6 +5,7 @@ import Splash from "./pages/Splash";
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 import Otp from "./pages/auth/Otp";
+import LoginOtp from "./pages/auth/loginOtp";
 import Dashboard from "./pages/dashboard/Dashboard";
 import TransferPage from "./pages/Transfer/TransferPage";
 import SendMoney from "./pages/Transfer/SendMoney";
@@ -30,6 +31,8 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/otp" element={<Otp />} />
+        <Route path="/otp-login" element={<LoginOtp />} />
+        
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/transfer" element={<TransferPage />} />
         <Route path="/send" element={<SendMoney />} />
