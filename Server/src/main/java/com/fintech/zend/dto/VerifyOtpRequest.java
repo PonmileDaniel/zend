@@ -1,6 +1,7 @@
 package com.fintech.zend.dto;
 
 public class VerifyOtpRequest {
+    private String challengeId;
     private String email;
     private String otp;
 
@@ -21,5 +22,13 @@ public class VerifyOtpRequest {
 
     public void setOtp(String otp) {
         this.otp = otp;
+    }
+
+    public String getChallengeId() {
+        return challengeId;
+    }
+
+    public void setChallengeId(String challengeId) {
+        this.challengeId = challengeId;
     }
 }
