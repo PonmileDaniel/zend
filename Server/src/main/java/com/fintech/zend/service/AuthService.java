@@ -1,6 +1,7 @@
 package com.fintech.zend.service;
 
 import java.security.SecureRandom;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -128,13 +129,30 @@ public class AuthService {
 
             String otp = generateOtp();
             String hashedOtp = passwordEncoder.encode(otp);
+            String challengeId = UUID.randomUUID().toString();
             // Stored hashed otp in Redis
-            String redisKey = "otp:login" + user.getEmail();
-            redisTemplate.opsForValue().set(redisKey, hashedOtp, 5, TimeUnit.MINUTES);
+            String OtpKey = "otp:login:" + challengeId;
+            String emailKey = "otp:login:email:" + challengeId;
+
+            redisTemplate.opsForValue().set(OtpKey, hashedOtp, 5, TimeUnit.MINUTES);
+
+            String email = user.getEmail();
+
+            if (email == null) {
+                throw new IllegalStateException("User email cannot be null.");
+            }
+
+            // Store email associated with this challenge
+            redisTemplate.opsForValue().set(
+                    emailKey,
+                    email,
+                    5,
+                    TimeUnit.MINUTES);
 
             // Send otp
             emailService.sendOtp(user.getEmail(), otp);
-            return new LoginResponse("Verification code sent to your registered email.");
+            return new LoginResponse("Verification code sent to your registered email.", challengeId,
+                    maskEmail(user.getEmail()));
         } catch (BadCredentialsException e) {
             throw new IllegalArgumentException("Invalid credentials");
 
@@ -265,22 +283,28 @@ public class AuthService {
     /**
      * Verifies a login OTP for a user.
      * 
-     * @param email the email address of the user
-     * @param otp the OTP to be verified
+     * @param email   the email address of the user
+     * @param otp     the OTP to be verified
      * @param request the HTTP request used to verify the OTP
-     * @throws IllegalArgumentException if the user is not found, or if the OTP has expired,
+     * @throws IllegalArgumentException if the user is not found, or if the OTP has
+     *                                  expired,
      *                                  or if the OTP is invalid
      */
-    public void verifyLoginOtp(String email, String otp, HttpServletRequest request) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
-        String redisKey = "otp:login:" + email;
+    public void verifyLoginOtp(String challengeId, String otp, HttpServletRequest request) {
+        String otpKey = "otp:login:" + challengeId;
+        String emailKey = "otp:login:email:" + challengeId;
 
-        String storedHashedOtp = redisTemplate.opsForValue().get(redisKey);
+        String storedHashedOtp = redisTemplate.opsForValue().get(otpKey);
 
         if (storedHashedOtp == null) {
             throw new IllegalArgumentException(
                     "OTP has expired. Please request a new code.");
+        }
+
+        String email = redisTemplate.opsForValue().get(emailKey);
+        if (email == null) {
+            throw new IllegalArgumentException(
+                    "Login challenge has expired. Please request a new OTP.");
         }
 
         if (!passwordEncoder.matches(otp, storedHashedOtp)) {
@@ -288,7 +312,10 @@ public class AuthService {
         }
 
         // OTP is correct, so delete it.
-        redisTemplate.delete(redisKey);
+        redisTemplate.delete(otpKey);
+        redisTemplate.delete(emailKey);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
 
         CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService
                 .loadUserByUsername(user.getEmail());
@@ -358,10 +385,18 @@ public class AuthService {
         emailService.sendOtp(email, otp);
     }
 
+    public void resendLoginOtp(String challengeId) {
+        // User user = userRepository.findByEmail(email).orElseThrow(() -> new
+        // IllegalArgumentException("User not found"));
+        String emailKey = "otp:login:email:" + challengeId;
+        String email = redisTemplate.opsForValue().get(emailKey);
 
-    public void resendLoginOtp(String email) {
-        // User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        String cooldownKey = "otp:login:resend-cooldown:" + email;
+        if (email == null) {
+            throw new IllegalArgumentException(
+                    "Login challenge has expired. Please start login again.");
+        }
+
+        String cooldownKey = "otp:login:resend-cooldown:" + challengeId;
         Boolean cooldownExists = redisTemplate.hasKey(cooldownKey);
 
         if (Boolean.TRUE.equals(cooldownExists)) {
@@ -369,24 +404,21 @@ public class AuthService {
         }
         String otp = generateOtp();
         String hashedOtp = passwordEncoder.encode(otp);
-        String otpKey = "otp:login:" + email;
+        String otpKey = "otp:login:" + challengeId;
         redisTemplate.opsForValue().set(
-            otpKey,
-            hashedOtp,
-            5,
-            TimeUnit.MINUTES
-        );
+                otpKey,
+                hashedOtp,
+                5,
+                TimeUnit.MINUTES);
 
         // Prevent another resend for 60 seconds.
         redisTemplate.opsForValue().set(
-            cooldownKey,
-            "1",
-            60,
-            TimeUnit.SECONDS
-        );
+                cooldownKey,
+                "1",
+                60,
+                TimeUnit.SECONDS);
         emailService.sendOtp(email, otp);
     }
-
 
     /**
      * Generates a unique account number for a user.
@@ -422,7 +454,7 @@ public class AuthService {
         String username = parts[0];
         String domain = parts[1];
 
-        if (username.length() <= 2){
+        if (username.length() <= 2) {
             return username.charAt(0) + "****@" + domain;
         }
         return username.substring(0, 2) + "****@" + domain;
