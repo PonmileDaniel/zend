@@ -15,7 +15,8 @@ export interface OtpResponse {
 
 export interface LoginResponse {
   message: string;
-  email: string;
+  challengeId: string;
+  maskedEmail: string;
 }
 
 export async function signup(data: SignupFormData): Promise<SignupResponse> {
@@ -103,7 +104,7 @@ export async function login(
 }
 
 export async function loginOtp(
-  email: string,
+  challengeId: string,
   otp: string,
 ): Promise<VerifyOtpResponse> {
   const response = await fetch(`${API_URL}/verify-login-otp`, {
@@ -112,7 +113,7 @@ export async function loginOtp(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      email,
+      challengeId,
       otp,
     }),
     credentials: "include",
@@ -126,14 +127,16 @@ export async function loginOtp(
   return result;
 }
 
-export async function resendloginOtp(email: string): Promise<OtpResponse> {
+export async function resendloginOtp(
+  challengeId: string,
+): Promise<OtpResponse> {
   const response = await fetch(`${API_URL}/resend-login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      email,
+      challengeId,
     }),
     credentials: "include",
   });
