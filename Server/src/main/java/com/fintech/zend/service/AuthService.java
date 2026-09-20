@@ -445,6 +445,13 @@ public class AuthService {
         return String.valueOf(otp);
     }
 
+    /**
+     * Masks an email address by replacing all but the first two characters
+     * of the username with asterisks.
+     * 
+     * @param email the email address to be masked
+     * @return the masked email address
+     */
     private String maskEmail(String email) {
         String[] parts = email.split("@");
 
