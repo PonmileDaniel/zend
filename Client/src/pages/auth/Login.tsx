@@ -23,9 +23,7 @@ export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
 
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
 
     setForm((previous) => ({
@@ -41,9 +39,7 @@ export default function Login() {
     setServerError("");
   };
 
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const result = loginSchema.safeParse(form);
@@ -59,8 +55,7 @@ export default function Login() {
           field in form &&
           !fieldErrors[field as keyof LoginFormData]
         ) {
-          fieldErrors[field as keyof LoginFormData] =
-            issue.message;
+          fieldErrors[field as keyof LoginFormData] = issue.message;
         }
       }
 
@@ -78,9 +73,9 @@ export default function Login() {
         result.data.password,
       );
 
-      sessionStorage.setItem("loginEmail", response.email);
-
-      navigate("/verify-login-otp");
+      sessionStorage.setItem("loginChallengeId", response.challengeId);
+      sessionStorage.setItem("loginMaskedEmail", response.maskedEmail);
+      navigate("/otp-login");
     } catch (error) {
       const message =
         error instanceof Error
@@ -97,7 +92,6 @@ export default function Login() {
   return (
     <AuthLayout>
       <div className="w-full max-w-md">
-
         {/* Heading */}
         <div className="mb-6">
           <h1 className="text-3xl font-semibold tracking-tight">
@@ -110,10 +104,7 @@ export default function Login() {
         </div>
 
         {/* Login Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-5"
-        >
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Server Error */}
           {serverError && (
             <div className="border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
@@ -123,7 +114,6 @@ export default function Login() {
 
           {/* Email / Account Number */}
           <div className="flex flex-col gap-1.5">
-
             <label
               htmlFor="emailorAccountNumber"
               className="text-xs font-medium uppercase tracking-[0.08em] text-[#a3a3a3]"
@@ -151,14 +141,11 @@ export default function Login() {
                 {errors.emailorAccountNumber}
               </p>
             )}
-
           </div>
 
           {/* Password */}
           <div className="flex flex-col gap-1.5">
-
             <div className="flex items-center justify-between">
-
               <label
                 htmlFor="password"
                 className="text-xs font-medium uppercase tracking-[0.08em] text-[#a3a3a3]"
@@ -172,7 +159,6 @@ export default function Login() {
               >
                 Forgot password?
               </button>
-
             </div>
 
             <input
@@ -184,18 +170,13 @@ export default function Login() {
               placeholder="Enter your password"
               autoComplete="current-password"
               className={`w-full border-0 border-b bg-[#0a0a0a] px-0 py-3 text-base text-white outline-none transition-colors placeholder:text-[#555] focus:border-white ${
-                errors.password
-                  ? "border-red-500"
-                  : "border-[#303030]"
+                errors.password ? "border-red-500" : "border-[#303030]"
               }`}
             />
 
             {errors.password && (
-              <p className="text-xs text-red-400">
-                {errors.password}
-              </p>
+              <p className="text-xs text-red-400">{errors.password}</p>
             )}
-
           </div>
 
           {/* Login Button */}
@@ -210,10 +191,8 @@ export default function Login() {
 
         {/* Signup */}
         <div className="mt-6 border-t border-[#262626] pt-5 text-center">
-
           <p className="text-sm text-[#a3a3a3]">
             Don't have an account?{" "}
-
             <button
               type="button"
               className="text-white transition-colors hover:underline"
@@ -222,9 +201,7 @@ export default function Login() {
               Sign up
             </button>
           </p>
-
         </div>
-
       </div>
     </AuthLayout>
   );
