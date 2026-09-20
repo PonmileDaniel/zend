@@ -133,7 +133,7 @@ public class AuthController {
     public ResponseEntity<LoginResponse> verifyLoginOtp(@RequestBody VerifyOtpRequest request,
             HttpServletRequest httpRequest) {
         try {
-            authService.verifyLoginOtp(request.getEmail(), request.getOtp(), httpRequest);
+            authService.verifyLoginOtp(request.getChallengeId(), request.getOtp(), httpRequest);
             return ResponseEntity.ok(new LoginResponse("Login Successful."));
 
         } catch (IllegalArgumentException e) {
@@ -145,7 +145,7 @@ public class AuthController {
     @PostMapping("/resend-login")
     public ResponseEntity<LoginResponse> resendLoginOtp(@RequestBody ResendOtpRequest request) {
         try {
-            authService.resendLoginOtp(request.getEmail());
+            authService.resendLoginOtp(request.getChallengeId());
             return ResponseEntity.ok(
                     new LoginResponse("A new verification code has been sent."));
 
