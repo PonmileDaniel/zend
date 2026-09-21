@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AuthLayout from "../../layouts/AuthLayout";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 import {
   loginSchema,
@@ -22,6 +23,7 @@ export default function Login() {
   const [errors, setErrors] = useState<LoginErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
@@ -161,18 +163,32 @@ export default function Login() {
               </button>
             </div>
 
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              autoComplete="current-password"
-              className={`w-full border-0 border-b bg-[#0a0a0a] px-0 py-3 text-base text-white outline-none transition-colors placeholder:text-[#555] focus:border-white ${
-                errors.password ? "border-red-500" : "border-[#303030]"
-              }`}
-            />
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                className={`w-full border-0 border-b bg-[#0a0a0a] px-0 py-3 text-base text-white outline-none transition-colors placeholder:text-[#555] focus:border-white ${
+                  errors.password ? "border-red-500" : "border-[#303030]"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((previous) => !previous)}
+                className="absolute right-1 top-1/2 -translate-y-1/2 text-[#555] transition-colors hover:text-[#a3a3a3]"
+                aria-label={showPassword ? "Hide password" : "Show Password"}
+              >
+                {showPassword ? (
+                  <EyeOff size={17} strokeWidth={1.5} />
+                ) : (
+                  <Eye size={17} strokeWidth={1.5} />
+                )}
+              </button>
+            </div>
 
             {errors.password && (
               <p className="text-xs text-red-400">{errors.password}</p>
