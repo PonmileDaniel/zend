@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Sidebar from "../../components/dashboard/Sidebar";
 import DashboardHeader from "../../components/dashboard/DashboardHeader";
@@ -7,6 +7,7 @@ import Transaction, {
 } from "../../components/dashboard/Transaction";
 import HelpSection from "../../components/dashboard/HelpSection";
 import ThisMonth from "../../components/dashboard/ThisMonth";
+import { type CurrentUserResponse, getCurrentUser } from "../../services/authApi";
 
 const transactions: TransactionData[] = [
   {
@@ -36,7 +37,20 @@ const transactions: TransactionData[] = [
 ];
 
 export default function Dashboard() {
+  const [user, setUser] = useState<CurrentUserResponse | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    loadUser();
+  }, [])
 
   return (
     <main className="min-h-screen bg-[#131313] text-white">
@@ -70,7 +84,7 @@ export default function Dashboard() {
 
                         <div className="mt-1">
                           <span className="font-mono text-sm text-[#d5d5d5]">
-                            1101423675
+                            {user?.accountNumber}
                           </span>
                         </div>
                       </div>
