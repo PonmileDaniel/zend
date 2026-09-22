@@ -19,6 +19,12 @@ export interface LoginResponse {
   maskedEmail: string;
 }
 
+export interface CurrentUserResponse {
+  id: number;
+  email: string;
+  accountNumber: string;
+}
+
 export async function signup(data: SignupFormData): Promise<SignupResponse> {
   const response = await fetch(`${API_URL}/signup`, {
     method: "POST",
@@ -144,6 +150,19 @@ export async function resendloginOtp(
 
   if (!response.ok) {
     throw new Error(result.message || "Unable to resend verification code");
+  }
+  return result;
+}
+
+export async function getCurrentUser(): Promise<CurrentUserResponse> {
+  const response = await fetch(`${API_URL}/me`, {
+    method: "GET",
+    credentials: "include",
+  });
+  const result = await response.json();
+
+  if (!response.ok){
+    throw new Error(result.message || "Not authenticated");
   }
   return result;
 }
