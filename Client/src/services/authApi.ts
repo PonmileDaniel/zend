@@ -1,4 +1,4 @@
-import API_URL from "../lib/api";
+import {API_URL} from "../lib/api";
 import type { SignupFormData } from "../schemas/auth/signupSchema";
 
 export interface SignupResponse {
@@ -166,3 +166,4 @@ export async function getCurrentUser(): Promise<CurrentUserResponse> {
   }
   return result;
 }
+
