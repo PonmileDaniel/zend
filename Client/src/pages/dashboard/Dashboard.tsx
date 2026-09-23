@@ -1,56 +1,42 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Sidebar from "../../components/dashboard/Sidebar";
 import DashboardHeader from "../../components/dashboard/DashboardHeader";
+import HelpSection from "../../components/dashboard/HelpSection";
+import ThisMonth from "../../components/dashboard/ThisMonth";
+import {
+  type DashboardResponse,
+  getDashboard,
+} from "../../services/dashboardApi";
 import Transaction, {
   type TransactionData,
 } from "../../components/dashboard/Transaction";
-import HelpSection from "../../components/dashboard/HelpSection";
-import ThisMonth from "../../components/dashboard/ThisMonth";
-import { type CurrentUserResponse, getCurrentUser } from "../../services/authApi";
-
-const transactions: TransactionData[] = [
-  {
-    name: "Daniel Ihenychukwu Ndukwe",
-    description: "Transfer",
-    amount: "₦50.00",
-    type: "debit",
-  },
-  {
-    name: "Daniel Ihenychukwu Ndukwe",
-    description: "Received money",
-    amount: "+ ₦150.00",
-    type: "credit",
-  },
-  {
-    name: "MTN NIG VTU",
-    description: "Airtime",
-    amount: "₦100.00",
-    type: "debit",
-  },
-  {
-    name: "Netflix",
-    description: "Subscription",
-    amount: "₦7,000.00",
-    type: "debit",
-  },
-];
 
 export default function Dashboard() {
-  const [user, setUser] = useState<CurrentUserResponse | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
+  const navigate = useNavigate();
+
+  const transactions: TransactionData[] =
+    dashboard?.recentTransactions.map((transaction) => ({
+      name: transaction.description,
+      description: transaction.transactionType,
+      amount: `₦${transaction.amount.toFixed(2)}`,
+      type: transaction.direction === "INWARD" ? "credit" : "debit",
+    })) ?? [];
 
   useEffect(() => {
-    async function loadUser() {
+    async function loadDashboard() {
       try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
+        const data = await getDashboard();
+        setDashboard(data);
       } catch (error) {
         console.error(error);
       }
     }
-    loadUser();
-  }, [])
+    loadDashboard();
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#131313] text-white">
@@ -65,7 +51,7 @@ export default function Dashboard() {
         {/* MAIN */}
         <div className="flex min-w-0 flex-1 flex-col">
           {/* HEADER */}
-          <DashboardHeader title="Home"/>
+          <DashboardHeader title="Home" />
 
           {/* CONTENT */}
           <div className="flex-1 overflow-y-auto">
@@ -84,7 +70,7 @@ export default function Dashboard() {
 
                         <div className="mt-1">
                           <span className="font-mono text-sm text-[#d5d5d5]">
-                            {user?.accountNumber}
+                            {dashboard?.accountNumber}
                           </span>
                         </div>
                       </div>
@@ -97,7 +83,7 @@ export default function Dashboard() {
                       </p>
 
                       <h2 className="mt-2 text-4xl font-semibold tracking-tight">
-                        ₦109.57
+                        ₦{dashboard?.balance.toFixed(2) ?? "0.00"}
                       </h2>
                     </div>
 
@@ -106,7 +92,8 @@ export default function Dashboard() {
                       <div className="flex gap-2">
                         <button
                           type="button"
-                          className="bg-white px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-[#d9d9d9]"
+                          onClick={() => navigate("/transfer")}
+                          className="cursor-pointer bg-white px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-[#d9d9d9]"
                         >
                           Transfer
                         </button>
