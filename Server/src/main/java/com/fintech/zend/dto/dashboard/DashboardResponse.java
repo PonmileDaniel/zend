@@ -3,15 +3,14 @@ package com.fintech.zend.dto.dashboard;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.fintech.zend.dto.transaction.TransactionResponse; 
-
+import com.fintech.zend.dto.transaction.TransactionResponse;
 
 public class DashboardResponse {
     private String accountNumber;
     private BigDecimal balance;
     private List<TransactionResponse> recentTransactions;
 
-    private DashboardResponse(String accountNumber,
+    public DashboardResponse(String accountNumber,
             BigDecimal balance,
             List<TransactionResponse> recentTransactions) {
         this.accountNumber = accountNumber;
