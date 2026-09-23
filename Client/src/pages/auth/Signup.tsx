@@ -78,8 +78,8 @@ export default function Signup() {
       const message =
         error instanceof Error
           ? error.message
-          : "Something went wronf. Please try again.";
-      console.error("Signup failed:", message);
+          : "Something went wrong. Please try again.";
+      // console.error("Signup failed:", message);
       setServerError(message);
     } finally {
       setIsSubmitting(false);
@@ -233,7 +233,7 @@ export default function Signup() {
                 {showPassword ? (
                   <EyeOff size={17} strokeWidth={1.5} />
                 ) : (
-                  <Eye size={17} strokeWidth={1.5} />
+                   <Eye size={17} strokeWidth={1.5} />
                 )}
               </button>
               {errors.password && (
