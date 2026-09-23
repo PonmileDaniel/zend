@@ -13,35 +13,32 @@ import java.util.List;
 @Service
 public class DashboardService {
 
-    private final BankAccountRepository accountRepository;
-    private final TransactionService transactionService;
+        private final BankAccountRepository accountRepository;
+        private final TransactionService transactionService;
 
-    public DashboardService(
-            BankAccountRepository accountRepository,
-            TransactionService transactionService) {
+        public DashboardService(
+                        BankAccountRepository accountRepository,
+                        TransactionService transactionService) {
 
-        this.accountRepository = accountRepository;
-        this.transactionService = transactionService;
-    }
+                this.accountRepository = accountRepository;
+                this.transactionService = transactionService;
+        }
 
-    public DashboardResponse getDashboard() {
+        public DashboardResponse getDashboard() {
 
-        SessionPrincipal user = SecurityUtils.getCurrentUser();
+                SessionPrincipal user = SecurityUtils.getCurrentUser();
 
-        BankAccount account = accountRepository
-                .findByAccountNumber(user.getAccountNumber())
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Account not found"));
+                BankAccount account = accountRepository
+                                .findByAccountNumber(user.getAccountNumber())
+                                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
 
-        List<TransactionResponse> recentTransactions =
-                transactionService
-                        .getTransaction(0, 5)
-                        .getContent();
+                List<TransactionResponse> recentTransactions = transactionService
+                                .getTransaction(0, 5)
+                                .getContent();
 
-        return new DashboardResponse(
-                account.getAccountNumber(),
-                account.getBalance(),
-                recentTransactions
-        );
-    }
+                return new DashboardResponse(
+                                account.getAccountNumber(),
+                                account.getBalance(),
+                                recentTransactions);
+        }
 }
