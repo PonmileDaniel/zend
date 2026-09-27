@@ -4,6 +4,7 @@ import com.fintech.zend.dto.dashboard.DashboardResponse;
 import com.fintech.zend.dto.transaction.TransactionResponse;
 import com.fintech.zend.model.BankAccount;
 import com.fintech.zend.repository.BankAccountRepository;
+import com.fintech.zend.repository.UserRepository;
 import com.fintech.zend.security.SecurityUtils;
 import com.fintech.zend.security.SessionPrincipal;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,15 @@ public class DashboardService {
 
         private final BankAccountRepository accountRepository;
         private final TransactionService transactionService;
+        private final UserRepository userRepository;
 
         public DashboardService(
                         BankAccountRepository accountRepository,
-                        TransactionService transactionService) {
+                        TransactionService transactionService, UserRepository userRepository) {
 
                 this.accountRepository = accountRepository;
                 this.transactionService = transactionService;
+                this.userRepository = userRepository;
         }
 
         public DashboardResponse getDashboard() {
@@ -36,9 +39,12 @@ public class DashboardService {
                                 .getTransaction(0, 5)
                                 .getContent();
 
+                boolean transactionPinConfigured = userRepository.findByEmail(user.getEmail())
+                                .orElseThrow(() -> new IllegalArgumentException("User not found")).hasTransactionPin();
+
                 return new DashboardResponse(
                                 account.getAccountNumber(),
                                 account.getBalance(),
-                                recentTransactions);
+                                recentTransactions, transactionPinConfigured);
         }
 }
