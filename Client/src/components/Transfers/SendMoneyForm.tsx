@@ -97,11 +97,6 @@ export default function SendMoneyForm({
 
   return (
     <div className="space-y-8">
-
-      {/* =========================================
-          TRANSFER PANEL
-      ========================================== */}
-
       <section className="border border-[#303030] bg-[#1A181A]">
 
         {/* Recipient */}
@@ -218,12 +213,6 @@ export default function SendMoneyForm({
         </form>
 
       </section>
-
-
-      {/* =========================================
-          PREVIOUS TRANSFERS
-      ========================================== */}
-
       <section>
 
         <div className="mb-3 flex items-center justify-between">
