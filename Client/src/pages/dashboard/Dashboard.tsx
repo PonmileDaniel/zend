@@ -12,6 +12,7 @@ import {
 import Transaction, {
   type TransactionData,
 } from "../../components/dashboard/Transaction";
+import SetTransactionPinNotice from "../../components/dashboard/SetTransactionPinNotice";
 
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -107,6 +108,23 @@ export default function Dashboard() {
                       </div>
                     </div>
                   </section>
+
+                  {dashboard && !dashboard.transactionPinConfigured && (
+                    <section className="mt-6">
+                      <SetTransactionPinNotice
+                        onSuccess={() => {
+                          setDashboard((previous) =>
+                            previous
+                              ? {
+                                  ...previous,
+                                  transactionPinConfigured: true,
+                                }
+                              : previous,
+                          );
+                        }}
+                      />
+                    </section>
+                  )}
 
                   {/* TRANSACTIONS */}
                   <section className="mt-8">
