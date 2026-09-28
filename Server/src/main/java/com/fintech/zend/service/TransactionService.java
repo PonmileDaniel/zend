@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import com.fintech.zend.repository.TransactionRepository;
 import com.fintech.zend.security.SecurityUtils;
 import com.fintech.zend.security.SessionPrincipal;
-import com.fintech.zend.model.Transaction;
+import com.fintech.zend.model.Transactions.Transaction;
 
 
 import com.fintech.zend.repository.BankAccountRepository;
