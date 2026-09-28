@@ -1,7 +1,7 @@
 package com.fintech.zend.repository;
 
 import com.fintech.zend.model.BankAccount;
-import com.fintech.zend.model.Transaction;
+import com.fintech.zend.model.Transactions.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
