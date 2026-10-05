@@ -37,7 +37,7 @@ export default function TransferSuccess({
           </p>
 
           <p className="mt-2 text-4xl font-semibold tracking-tight">
-            ₦{amount}
+            N{amount}
           </p>
         </div>
 
