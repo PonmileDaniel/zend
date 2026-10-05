@@ -14,6 +14,13 @@ import Transaction, {
 } from "../../components/dashboard/Transaction";
 import SetTransactionPinNotice from "../../components/dashboard/SetTransactionPinNotice";
 
+function formatNaira(amount: number): string {
+  return `₦${amount.toLocaleString("en-NG", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
@@ -38,6 +45,7 @@ export default function Dashboard() {
     }
     loadDashboard();
   }, []);
+  
 
   return (
     <main className="min-h-screen bg-[#131313] text-white">
@@ -84,7 +92,8 @@ export default function Dashboard() {
                       </p>
 
                       <h2 className="mt-2 text-4xl font-semibold tracking-tight">
-                        ₦{dashboard?.balance.toFixed(2) ?? "0.00"}
+                        {/* {formatNaira{dashboard?.balance.toFixed(2) ?? "0.00"}} */}
+                        {formatNaira(Number(dashboard?.balance ?? 0))}
                       </h2>
                     </div>
 
