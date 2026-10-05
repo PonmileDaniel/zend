@@ -5,6 +5,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fintech.zend.model.Transactions.Transaction;
+import com.fintech.zend.model.Transactions.TransactionDirection;
+import com.fintech.zend.model.Transactions.TransactionStatus;
+import com.fintech.zend.model.Transactions.TransactionType;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -134,6 +139,15 @@ public class BankAccount implements Serializable {
                             tx.getDescription() + " | " +
                             tx.getAmount());
         }
+    }
+
+    // This is for the welcome funds
+    public void receiveWelcomeFunds(BigDecimal amount, String reference) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Welcome funds amount must be gretaer than zero.");
+        }
+        this.balance = this.balance.add(amount);
+        addTransaction("Welcome Demo Funds", amount, TransactionType.DEPOSIT, TransactionDirection.INWARD, reference);
     }
 
     @Override
