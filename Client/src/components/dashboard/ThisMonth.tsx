@@ -15,7 +15,7 @@ export default function ThisMonth() {
       </div>
 
       <p className="mt-4 text-2xl font-semibold">
-        ₦12,450.00
+        N12,450.00
       </p>
 
       <p className="mt-1 text-xs text-[#666]">
