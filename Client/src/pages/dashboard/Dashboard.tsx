@@ -15,7 +15,7 @@ import Transaction, {
 import SetTransactionPinNotice from "../../components/dashboard/SetTransactionPinNotice";
 
 function formatNaira(amount: number): string {
-  return `₦${amount.toLocaleString("en-NG", {
+  return `N${amount.toLocaleString("en-NG", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
