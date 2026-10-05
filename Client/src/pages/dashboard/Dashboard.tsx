@@ -30,7 +30,7 @@ export default function Dashboard() {
     dashboard?.recentTransactions.map((transaction) => ({
       name: transaction.description,
       description: transaction.transactionType,
-      amount: `₦${transaction.amount.toFixed(2)}`,
+      amount: `N${transaction.amount.toFixed(2)}`,
       type: transaction.direction === "INWARD" ? "credit" : "debit",
     })) ?? [];
 
