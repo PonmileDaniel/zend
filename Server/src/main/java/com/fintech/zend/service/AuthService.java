@@ -3,6 +3,8 @@ package com.fintech.zend.service;
 import java.security.SecureRandom;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,15 +18,17 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.stereotype.Service;
 
 import com.fintech.zend.config.CustomUserDetails;
-import com.fintech.zend.dto.LoginRequest;
-import com.fintech.zend.dto.LoginResponse;
-import com.fintech.zend.dto.SignupRequest;
-import com.fintech.zend.dto.SignupResponse;
+import com.fintech.zend.dto.login.LoginRequest;
+import com.fintech.zend.dto.login.LoginResponse;
+import com.fintech.zend.dto.signup.SignupRequest;
+import com.fintech.zend.dto.signup.SignupResponse;
 import com.fintech.zend.model.BankAccount;
 import com.fintech.zend.model.User;
 import com.fintech.zend.repository.BankAccountRepository;
 import com.fintech.zend.repository.UserRepository;
 import com.fintech.zend.security.SessionPrincipal;
+import com.fintech.zend.model.welcome.WelcomeCredit;
+import com.fintech.zend.repository.WelcomeCreditRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 // import jakarta.servlet.http.HttpSession;
@@ -39,12 +43,13 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final SecureRandom random = new SecureRandom();
     private final StringRedisTemplate redisTemplate;
+    private final WelcomeCreditRepository welcomeCreditRepository;
     private final EmailService emailService;
 
     public AuthService(UserRepository userRepository, BankAccountRepository accountRepository,
             BCryptPasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
             StringRedisTemplate redisTemplate, EmailService emailService,
-            CustomUserDetailsService customUserDetailsService) {
+            CustomUserDetailsService customUserDetailsService, WelcomeCreditRepository welcomeCreditRepository) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
@@ -52,6 +57,7 @@ public class AuthService {
         this.redisTemplate = redisTemplate;
         this.emailService = emailService;
         this.customUserDetailsService = customUserDetailsService;
+         this.welcomeCreditRepository = welcomeCreditRepository;
     }
 
     /**
@@ -78,6 +84,14 @@ public class AuthService {
         String encryptedPassword = passwordEncoder.encode(request.getPassword());
 
         accountRepository.save(account);
+
+        WelcomeCredit welcomeCredit = new WelcomeCredit(
+            account,
+            new BigDecimal("100000.00"),
+            "WELCOME-" + accountNumber,
+            LocalDateTime.now().plusSeconds(10)
+        );
+        welcomeCreditRepository.save(welcomeCredit);
 
         User user = new User(
                 request.getFirstName(),
