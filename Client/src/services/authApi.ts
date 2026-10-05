@@ -136,7 +136,7 @@ export async function loginOtp(
 export async function resendloginOtp(
   challengeId: string,
 ): Promise<OtpResponse> {
-  const response = await fetch(`${API_URL}/resend-login`, {
+  const response = await fetch(`${API_URL}/resend-login-otp`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
