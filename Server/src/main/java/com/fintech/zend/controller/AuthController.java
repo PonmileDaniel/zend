@@ -7,15 +7,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import java.util.Map;
 
-import com.fintech.zend.dto.LoginRequest;
-import com.fintech.zend.dto.LoginResponse;
 import com.fintech.zend.dto.OtpResponse;
-import com.fintech.zend.dto.SignupRequest;
-import com.fintech.zend.dto.SignupResponse;
-import com.fintech.zend.dto.TransactionPinRequest;
-import com.fintech.zend.dto.VerifyOtpRequest;
-import com.fintech.zend.dto.ResendOtpRequest;
+import com.fintech.zend.dto.login.LoginRequest;
+import com.fintech.zend.dto.login.LoginResponse;
+import com.fintech.zend.dto.loginOtp.ResendOtpRequest;
+import com.fintech.zend.dto.loginOtp.VerifyOtpRequest;
+import com.fintech.zend.dto.signup.SignupRequest;
+import com.fintech.zend.dto.signup.SignupResponse;
 import com.fintech.zend.security.SessionPrincipal;
 import com.fintech.zend.service.AuthService;
 
@@ -142,7 +143,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/resend-login")
+    @PostMapping("/resend-login-otp")
     public ResponseEntity<LoginResponse> resendLoginOtp(@RequestBody ResendOtpRequest request) {
         try {
             authService.resendLoginOtp(request.getChallengeId());
@@ -154,28 +155,15 @@ public class AuthController {
         }
     }
 
-    /**
-     * Creates a transaction PIN for a user.
-     * 
-     * @param request        the request containing the transaction PIN
-     * @param authentication the authentication details of the user
-     * @return a ResponseEntity containing a successful message if the transaction
-     *         PIN
-     *         was created successfully, or an error message if the creation failed
-     */
-    @PostMapping("/transaction-pin")
-    public ResponseEntity<String> createTransactionPin(@RequestBody TransactionPinRequest request,
-            Authentication authentication) {
-
-        try {
-            SessionPrincipal principal = (SessionPrincipal) authentication.getPrincipal();
-            authService.createTransactionPin(principal.getEmail(), request.getPin(), request.getConfirmPin());
-            return ResponseEntity.ok("Transaction PIN created successfullly.");
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(e.getMessage());
-        }
-
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        SessionPrincipal principal =  (SessionPrincipal) authentication.getPrincipal();
+        return ResponseEntity.ok(
+            Map.of(
+                "id", principal.getId(),
+                "email", principal.getEmail(),
+                "accountNumber", principal.getAccountNumber()
+            )
+        );
     }
 }
