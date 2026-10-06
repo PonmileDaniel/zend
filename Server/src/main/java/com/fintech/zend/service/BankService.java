@@ -15,14 +15,11 @@ import com.fintech.zend.security.SessionPrincipal;
 public class BankService {
 
     private final BankAccountRepository accountRepository;
-    // private final PasswordEncoder passwordEncoder;
-    // private final UserRepository userRepository;
 
     public BankService(BankAccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 
-    
     /**
      * Deposits money into a bank account.
      * 
