@@ -1,6 +1,5 @@
 package com.fintech.zend.service;
 
-
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fintech.zend.dto.RecipientResponse;
@@ -11,7 +10,6 @@ import com.fintech.zend.repository.BankAccountRepository;
 import com.fintech.zend.repository.UserRepository;
 import com.fintech.zend.security.SecurityUtils;
 import com.fintech.zend.security.SessionPrincipal;
-
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -26,7 +24,8 @@ public class TransferService {
         private final BankAccountRepository accountRepository;
         private final PasswordEncoder passwordEncoder;
 
-        public TransferService(UserRepository userRepository, BankAccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+        public TransferService(UserRepository userRepository, BankAccountRepository accountRepository,
+                        PasswordEncoder passwordEncoder) {
                 this.userRepository = userRepository;
                 this.accountRepository = accountRepository;
                 this.passwordEncoder = passwordEncoder;
