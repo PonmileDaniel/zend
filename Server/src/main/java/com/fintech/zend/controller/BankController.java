@@ -25,7 +25,6 @@ public class BankController {
         this.bank = bank;
     }
 
-
     /**
      * Retrieves the statement of a bank account.
      * 
