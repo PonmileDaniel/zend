@@ -37,9 +37,11 @@ export async function transferMoney(request: TransferRequest): Promise<string> {
     credentials: "include",
     body: JSON.stringify(request),
   });
-  const result = await response.json();
+
+  ///////////////////////////////////////Work on theis let it be a json
+  const result = await response.text();
   if (!response.ok) {
-    throw new Error(result || "Transfer failed");
+    throw new Error(result);
   }
   return result;
 }
