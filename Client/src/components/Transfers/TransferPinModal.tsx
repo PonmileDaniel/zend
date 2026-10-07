@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 type TransferPinModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (pin: string) => void;
 
   recipientName: string;
   amount: string;
@@ -158,28 +158,7 @@ export default function TransferPinModal({
       return;
     }
 
-    // console.log({
-    //   recipientName,
-    //   amount,
-    //   description,
-    //   pin: enteredPin,
-    // });
-
-    /*
-     * Later:
-     *
-     * POST /api/transfers
-     *
-     * {
-     *   accountNumber,
-     *   amount,
-     *   description,
-     *   pin
-     * }
-     *
-     * For now we just log it.
-     */
-    onConfirm();
+    onConfirm(enteredPin);
   };
 
 
