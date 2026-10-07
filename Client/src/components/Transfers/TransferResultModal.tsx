@@ -7,18 +7,8 @@ type TransferResultModalProps = {
   recipientName: string;
   amount: string;
   description: string;
+  errorMessage?: string;
 };
-
-/*************  ✨ Windsurf Command ⭐  *************/
-/**
- * A modal component that displays a transfer result.
- *
- * It takes in the following props:
- * - `isOpen`: A boolean indicating whether the modal should be open or not.
- * - `status`: A string indicating whether the transfer was successful or not.
- * - `onClose`: A function to be called when the modal is closed.
-
-/*******  c7189808-342c-41f6-b9ec-7d4a31073610  *******/
 export default function TransferResultModal({
   isOpen,
   status,
@@ -26,6 +16,7 @@ export default function TransferResultModal({
   recipientName,
   amount,
   description,
+  errorMessage
 }: TransferResultModalProps) {
   if (!isOpen) {
     return null;
@@ -48,6 +39,7 @@ export default function TransferResultModal({
           <h2 className="text-base font-semibold">
             {isSuccess ? "Transfer successful" : "Transfer failed"}
           </h2>
+          <p className="mt-2 text-sm text-[#999]"> {errorMessage || "Something went wrong."} </p>
 
           <button
             type="button"
@@ -97,7 +89,7 @@ export default function TransferResultModal({
             <p className="mt-2 text-sm text-[#777]">
               {isSuccess
                 ? `Your transfer to ${recipientName} has been completed.`
-                : "Something went wrong while processing your transfer. Your account has not been charged."}
+                : errorMessage || "Something went wrong while processing your transfer. Your account has not been charged."}
             </p>
           </div>
 
