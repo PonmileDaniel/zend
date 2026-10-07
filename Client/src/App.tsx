@@ -8,7 +8,6 @@ import Otp from "./pages/auth/Otp";
 import LoginOtp from "./pages/auth/loginOtp";
 import Dashboard from "./pages/dashboard/Dashboard";
 import TransferPage from "./pages/Transfer/TransferPage";
-import SendMoney from "./pages/Transfer/SendMoney";
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -35,7 +34,6 @@ function App() {
         
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/transfer" element={<TransferPage />} />
-        <Route path="/send" element={<SendMoney />} />
 
         <Route path="/" element={<Navigate to="/signup" replace />} />
 
