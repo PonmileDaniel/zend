@@ -28,6 +28,7 @@ interface TransferProps {
   loading: boolean;
   error: string;
   onAccountNumberChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onContinue: () => void;
 }
 
 export default function Transfer({
@@ -36,6 +37,7 @@ export default function Transfer({
   loading,
   error,
   onAccountNumberChange,
+  onContinue,
 }: TransferProps) {
   const isValidAccountNumber = accountNumber.length === 10;
 
@@ -45,6 +47,7 @@ export default function Transfer({
     if (!isValidAccountNumber || !recipient) {
       return;
     }
+    onContinue();
 
     console.log("Continue transfer:", {
       accountNumber,
