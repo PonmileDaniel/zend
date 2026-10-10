@@ -1,6 +1,7 @@
 import { API_URL_DASHBOARD } from "../lib/api";
 
 export interface DashboardTransaction {
+  name: string;
   reference: string;
   description: string;
   amount: number;
