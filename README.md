@@ -316,4 +316,4 @@ Balances and welcome funds are for demonstration purposes. Do not use the applic
 
 ---
 
-**Zend — Build the financial experience. Understand the systems behind it. Built for Resilence**
+**Zend — Build the financial experience. Understand the systems behind it. Built for Resilence.**
