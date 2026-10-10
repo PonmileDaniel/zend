@@ -12,23 +12,25 @@ public class TransactionResponse {
     private String status;
     private LocalDateTime timestamp;
     private String reference;
+    private String name;
 
     public TransactionResponse(
-            String description,
             String reference,
+            String description,
             BigDecimal amount,
             String transactionType,
             String direction,
             String status,
-            LocalDateTime timestamp) {
+            LocalDateTime timestamp, String name) {
 
+        this.reference = reference;
         this.description = description;
         this.amount = amount;
         this.transactionType = transactionType;
         this.direction = direction;
         this.status = status;
         this.timestamp = timestamp;
-        this.reference = reference;
+        this.name = name;
     }
 
     public String getReference() {
@@ -58,4 +60,8 @@ public class TransactionResponse {
     public LocalDateTime getTimestamp() {
         return timestamp;
     }
+
+    public String getName() {
+        return name;
+    } 
 }
