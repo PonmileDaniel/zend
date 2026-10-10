@@ -28,10 +28,14 @@ export default function Dashboard() {
 
   const transactions: TransactionData[] =
     dashboard?.recentTransactions.map((transaction) => ({
-      name: transaction.description,
+      name: transaction.name,
       description: transaction.transactionType,
-      amount: `N${transaction.amount.toFixed(2)}`,
+      amount: `N${transaction.amount.toLocaleString("en-NG", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
       type: transaction.direction === "INWARD" ? "credit" : "debit",
+      timestamp: transaction.timestamp,
     })) ?? [];
 
   useEffect(() => {
@@ -45,7 +49,6 @@ export default function Dashboard() {
     }
     loadDashboard();
   }, []);
-  
 
   return (
     <main className="min-h-screen bg-[#131313] text-white">
@@ -92,7 +95,6 @@ export default function Dashboard() {
                       </p>
 
                       <h2 className="mt-2 text-4xl font-semibold tracking-tight">
-                        {/* {formatNaira{dashboard?.balance.toFixed(2) ?? "0.00"}} */}
                         {formatNaira(Number(dashboard?.balance ?? 0))}
                       </h2>
                     </div>
