@@ -1,5 +1,4 @@
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
-// import { string } from "zod";
 
 export type TransactionData = {
   name: string;
@@ -45,29 +44,23 @@ export default function Transaction({ transaction }: TransactionProps) {
 
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{transaction.name}</p>
-
-          {/* <p className="mt-1 text-xs text-[#666]">{transaction.description}</p> */}
-          {/* </div> */}
-
           <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-[#666]">
             <span>{transaction.description}</span>
             <span>.</span>
             <span>{formatTimestamp(transaction.timestamp)}</span>
-
-            {/* <p className="mt-1 text-xs text-[#666]">{transaction.description}</p> */}
           </div>
         </div>
       </div>
-
 
       {/* Right */}
       <div className="ml-4 shrink-0 text-right">
         <p
           className={`text-sm font-semibold ${
-           isCredit ? "text-[#35CF8A]" : "text-white"
+            isCredit ? "text-[#35CF8A]" : "text-white"
           }`}
         >
-          {isCredit ? "+" : "−"}{transaction.amount}
+          {isCredit ? "+" : "−"}
+          {transaction.amount}
         </p>
 
         <p className="mt-1 text-[10px] uppercase tracking-[0.05em] text-[#666]">
