@@ -1,7 +1,7 @@
 package com.fintech.zend.model.Transactions;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fintech.zend.model.BankAccount;
@@ -53,7 +53,7 @@ public class Transaction {
     private BigDecimal amount;
 
     @Column(nullable = false)
-    private LocalDateTime timestamp;
+    private Instant timestamp;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -100,11 +100,11 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public LocalDateTime getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
+    public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
 
