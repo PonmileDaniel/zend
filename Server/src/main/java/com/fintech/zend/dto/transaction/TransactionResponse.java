@@ -1,7 +1,7 @@
 package com.fintech.zend.dto.transaction;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public class TransactionResponse {
 
@@ -10,7 +10,7 @@ public class TransactionResponse {
     private String transactionType;
     private String direction;
     private String status;
-    private LocalDateTime timestamp;
+    private Instant timestamp;
     private String reference;
     private String name;
 
@@ -21,7 +21,7 @@ public class TransactionResponse {
             String transactionType,
             String direction,
             String status,
-            LocalDateTime timestamp, String name) {
+            Instant timestamp, String name) {
 
         this.reference = reference;
         this.description = description;
@@ -57,7 +57,7 @@ public class TransactionResponse {
         return status;
     }
 
-    public LocalDateTime getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
