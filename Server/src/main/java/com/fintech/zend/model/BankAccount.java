@@ -88,7 +88,7 @@ public class BankAccount implements Serializable {
         tx.setDescription(description);
         tx.setReference(reference);
         tx.setAmount(amount);
-        tx.setTimestamp(java.time.LocalDateTime.now());
+        tx.setTimestamp(java.time.Instant.now());
         tx.setTransactionType(transactionType);
         tx.setDirection(direction);
         tx.setStatus(TransactionStatus.SUCCESS);
