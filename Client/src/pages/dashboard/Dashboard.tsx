@@ -12,8 +12,8 @@ import {
 import Transaction, {
   type TransactionData,
 } from "../../components/dashboard/Transaction";
+import TransactionReceipt from "../../components/dashboard/TransactionReceipt";
 import SetTransactionPinNotice from "../../components/dashboard/SetTransactionPinNotice";
-
 function formatNaira(amount: number): string {
   return `N${amount.toLocaleString("en-NG", {
     minimumFractionDigits: 2,
@@ -24,17 +24,23 @@ function formatNaira(amount: number): string {
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<TransactionData | null>(null);
+
   const navigate = useNavigate();
 
   const transactions: TransactionData[] =
     dashboard?.recentTransactions.map((transaction) => ({
+      reference: transaction.reference,
       name: transaction.name,
-      description: transaction.transactionType,
-      amount: `N${transaction.amount.toLocaleString("en-NG", {
+      description: transaction.description,
+      transactionType: transaction.transactionType,
+      amount: transaction.amount.toLocaleString("en-NG", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      })}`,
+      }),
       type: transaction.direction === "INWARD" ? "credit" : "debit",
+      status: transaction.status,
       timestamp: transaction.timestamp,
     })) ?? [];
 
@@ -47,6 +53,7 @@ export default function Dashboard() {
         console.error(error);
       }
     }
+
     loadDashboard();
   }, []);
 
@@ -120,6 +127,7 @@ export default function Dashboard() {
                     </div>
                   </section>
 
+                  {/* TRANSACTION PIN NOTICE */}
                   {dashboard && !dashboard.transactionPinConfigured && (
                     <section className="mt-6">
                       <SetTransactionPinNotice
@@ -137,7 +145,7 @@ export default function Dashboard() {
                     </section>
                   )}
 
-                  {/* TRANSACTIONS */}
+                  {/* RECENT TRANSACTIONS */}
                   <section className="mt-8">
                     <div className="mb-3 flex items-center justify-between">
                       <h2 className="text-sm font-semibold">
@@ -153,20 +161,33 @@ export default function Dashboard() {
                     </div>
 
                     <div className="border border-[#262626] bg-[#1A181A]">
-                      {transactions.map((transaction, index) => (
-                        <Transaction
-                          key={`${transaction.name}-${index}`}
-                          transaction={transaction}
-                        />
-                      ))}
+                      {transactions.length > 0 ? (
+                        transactions.map((transaction) => (
+                          <Transaction
+                            key={transaction.reference}
+                            transaction={transaction}
+                            onClick={() =>
+                              setSelectedTransaction(transaction)
+                            }
+                          />
+                        ))
+                      ) : (
+                        <div className="px-5 py-10 text-center">
+                          <p className="text-sm text-[#aaa]">
+                            No recent transactions
+                          </p>
+                          <p className="mt-1 text-xs text-[#666]">
+                            Your transactions will appear here.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </section>
                 </div>
 
-                {/* RIGHT */}
+                {/* RIGHT SIDEBAR */}
                 <aside className="hidden xl:block">
                   <HelpSection />
-
                   <ThisMonth />
                 </aside>
               </div>
@@ -174,6 +195,14 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* RECEIPT MODAL */}
+      {selectedTransaction && (
+        <TransactionReceipt
+          transaction={selectedTransaction}
+          onClose={() => setSelectedTransaction(null)}
+        />
+      )}
     </main>
   );
 }
