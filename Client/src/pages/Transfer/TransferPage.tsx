@@ -15,6 +15,7 @@ import {
   type RecipientResponse,
 } from "../../services/transferApi";
 
+
 type TransferStep = "recipient" | "amount";
 
 export default function TransferPage() {
