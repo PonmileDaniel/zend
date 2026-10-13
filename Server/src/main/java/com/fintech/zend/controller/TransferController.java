@@ -1,5 +1,7 @@
 package com.fintech.zend.controller;
 
+import java.util.List;
+
 import com.fintech.zend.dto.RecipientResponse;
 import com.fintech.zend.dto.TransferRequest;
 import com.fintech.zend.security.SecurityUtils;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.fintech.zend.dto.RecentAccountResponse;
 
 @RestController
 @RequestMapping("/api/transfers")
@@ -30,6 +33,11 @@ public class TransferController {
         RecipientResponse recipient = transferService.findRecipient(accountNumber);
 
         return ResponseEntity.ok(recipient);
+    }
+
+    @GetMapping("/recent-accounts")
+    public ResponseEntity<List<RecentAccountResponse>> getAccount()  {
+        return ResponseEntity.ok(transferService.getRecentAccounts());
     }
 
     /**
