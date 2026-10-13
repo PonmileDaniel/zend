@@ -35,6 +35,14 @@ public class TransferController {
         return ResponseEntity.ok(recipient);
     }
 
+    /**
+     * Retrieves a list of recent accounts that the authenticated user has
+     * transferred money to or received money from.
+     * 
+     * @return a ResponseEntity containing a list of RecentAccountResponse objects
+     *         if the request was successful, or an error message if the
+     *         request failed
+     */
     @GetMapping("/recent-accounts")
     public ResponseEntity<List<RecentAccountResponse>> getAccount()  {
         return ResponseEntity.ok(transferService.getRecentAccounts());
