@@ -10,10 +10,22 @@ import com.fintech.zend.repository.BankAccountRepository;
 import com.fintech.zend.repository.UserRepository;
 import com.fintech.zend.security.SecurityUtils;
 import com.fintech.zend.security.SessionPrincipal;
+import com.fintech.zend.model.Transactions.Transaction;
+import com.fintech.zend.model.Transactions.TransactionDirection;
+import com.fintech.zend.model.Transactions.TransactionStatus;
+import com.fintech.zend.model.Transactions.TransactionType;
+import com.fintech.zend.repository.TransactionRepository;
+import com.fintech.zend.dto.RecentAccountResponse;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +35,14 @@ public class TransferService {
         private final UserRepository userRepository;
         private final BankAccountRepository accountRepository;
         private final PasswordEncoder passwordEncoder;
+        private final TransactionRepository transactionRepository;
 
         public TransferService(UserRepository userRepository, BankAccountRepository accountRepository,
-                        PasswordEncoder passwordEncoder) {
+                        PasswordEncoder passwordEncoder, TransactionRepository transactionRepository) {
                 this.userRepository = userRepository;
                 this.accountRepository = accountRepository;
                 this.passwordEncoder = passwordEncoder;
+                this.transactionRepository = transactionRepository;
         }
 
         public RecipientResponse findRecipient(String accountNumber) {
@@ -108,6 +122,65 @@ public class TransferService {
 
                 accountRepository.save(from);
                 accountRepository.save(to);
+        }
+
+        @Transactional(readOnly = true)
+        public List<RecentAccountResponse> getRecentAccounts() {
+
+                SessionPrincipal currentUser = SecurityUtils.getCurrentUser();
+
+                BankAccount senderAccount = accountRepository
+                                .findByAccountNumber(currentUser.getAccountNumber())
+                                .orElseThrow(() -> new IllegalArgumentException("Sender account not found"));
+
+                List<RecentAccountResponse> recentAccounts = new ArrayList<>();
+                Set<String> seenAccountNumbers = new HashSet<>();
+
+                Page<Transaction> transactions = transactionRepository
+                                .findByBankAccountAndDirectionAndTransactionTypeAndStatusOrderByTimestampDesc(
+                                                senderAccount,
+                                                TransactionDirection.OUTWARD,
+                                                TransactionType.TRANSFER,
+                                                TransactionStatus.SUCCESS,
+                                                PageRequest.of(0, 50));
+
+                for (Transaction transaction : transactions.getContent()) {
+
+                        List<Transaction> matchingTransactions = transactionRepository.findByReferenceAndBankAccountNot(
+                                        transaction.getReference(),
+                                        senderAccount);
+
+                        for (Transaction recipientTransaction : matchingTransactions) {
+
+                                if (recipientTransaction.getDirection() != TransactionDirection.INWARD
+                                                || recipientTransaction.getTransactionType() != TransactionType.TRANSFER
+                                                || recipientTransaction.getStatus() != TransactionStatus.SUCCESS) {
+                                        continue;
+                                }
+
+                                BankAccount recipientAccount = recipientTransaction.getBankAccount();
+                                String accountNumber = recipientAccount.getAccountNumber();
+
+                                if (!seenAccountNumbers.add(accountNumber)) {
+                                        continue;
+                                }
+
+                                userRepository.findByBankAccount_AccountNumber(accountNumber)
+                                                .ifPresent(recipient -> {
+                                                        String name = (recipient.getFirstName() + " "
+                                                                        + recipient.getLastName()).trim();
+
+                                                        recentAccounts.add(
+                                                                        new RecentAccountResponse(name, accountNumber));
+                                                });
+
+                                if (recentAccounts.size() == 3) {
+                                        return recentAccounts;
+                                }
+                        }
+                }
+
+                return recentAccounts;
         }
 
         private String generateTransactionReference() {
