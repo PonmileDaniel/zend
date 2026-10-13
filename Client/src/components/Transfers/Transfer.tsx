@@ -1,6 +1,7 @@
 import { ArrowRight, Clock3 } from "lucide-react";
 import type { ChangeEvent, FormEvent } from "react";
 import type { RecipientResponse } from "../../services/transferApi";
+import MobileBackButton from "../dashboard/MobileBackButton";
 
 type RecentTransfer = {
   name: string;
@@ -60,9 +61,14 @@ export default function Transfer({
       <section className="border border-[#303030] bg-[#1A181A]">
         {/* Header */}
         <div className="border-b border-[#303030] px-5 py-5">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Transfer money
-          </h1>
+          <div className="flex items-center gap-3">
+            <div className="lg:hidden">
+              <MobileBackButton to="/dashboard" />
+            </div>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Transfer money
+            </h1>
+          </div>
 
           <p className="mt-2 text-sm text-[#777]">
             Enter the account number of the person you want to send money to.
