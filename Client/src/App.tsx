@@ -19,7 +19,7 @@ function HomeRedirect() {
   if (isLoading) {
     return <div>Checking your session...</div>;
   }
-  return <Navigate to={isAuthenticated ? "/dashboard" : "login"} replace />;
+  return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />;
 }
 function AppRoutes() {
   const [showSplash, setShowSplash] = useState(true);
@@ -38,7 +38,7 @@ function AppRoutes() {
 
   return (
     <Routes>
-      // Public Authentication pages
+      {/* Public Authentication pages */}
       <Route element={<PublicRoute />}>
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
