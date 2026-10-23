@@ -19,24 +19,6 @@ type PreviousTransfer = {
 };
 
 const previousTransfers: PreviousTransfer[] = [
-  {
-    name: "Daniel Ihenychukwu Ndukwe",
-    accountNumber: "2919144394",
-    amount: "₦50.00",
-    type: "sent",
-  },
-  {
-    name: "Daniel Ihenychukwu Ndukwe",
-    accountNumber: "2919144394",
-    amount: "₦150.00",
-    type: "received",
-  },
-  {
-    name: "MTN NIG VTU",
-    accountNumber: "2349137158820",
-    amount: "₦100.00",
-    type: "sent",
-  },
 ];
 
 export default function SendMoneyForm({
@@ -140,7 +122,7 @@ export default function SendMoneyForm({
             <div className="mt-3 flex items-center border-b border-[#404040] focus-within:border-white">
 
               <span className="mr-3 text-lg text-[#777]">
-                ₦
+                N
               </span>
 
               <input
