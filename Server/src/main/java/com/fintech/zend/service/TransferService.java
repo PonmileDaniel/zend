@@ -113,7 +113,7 @@ public class TransferService {
 
                 String reference = generateTransactionReference();
                 try {
-                        from.withdraw(amount, reference);
+                        from.withdraw(amount, description, reference);
 
                         to.receiveTransfer(amount, description, reference);
                 } catch (InsufficientFundsException e) {
