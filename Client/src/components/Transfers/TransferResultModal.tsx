@@ -39,7 +39,6 @@ export default function TransferResultModal({
           <h2 className="text-base font-semibold">
             {isSuccess ? "Transfer successful" : "Transfer failed"}
           </h2>
-          <p className="mt-2 text-sm text-[#999]"> {errorMessage || "Something went wrong."} </p>
 
           <button
             type="button"
