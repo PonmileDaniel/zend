@@ -103,7 +103,7 @@ public class BankAccount implements Serializable {
         addTransaction("Deposit ", amount, TransactionType.DEPOSIT, TransactionDirection.INWARD, reference);
     }
 
-    public void withdraw(BigDecimal amount, String reference) throws InsufficientFundsException {
+    public void withdraw(BigDecimal amount, String description, String reference) throws InsufficientFundsException {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Withdrawal amount must be positive.");
         }
@@ -111,7 +111,7 @@ public class BankAccount implements Serializable {
             throw new InsufficientFundsException("Insufficient funds. Balance: " + balance);
         }
         this.balance = this.balance.subtract(amount);
-        addTransaction("Transfer", amount, TransactionType.TRANSFER, TransactionDirection.OUTWARD, reference);
+        addTransaction(description, amount, TransactionType.TRANSFER, TransactionDirection.OUTWARD, reference);
     }
 
     public void receiveTransfer(
