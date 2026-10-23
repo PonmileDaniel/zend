@@ -9,7 +9,7 @@ export default function ProtectedRoute() {
     return <div>Checking your session...</div>;
   }
 
-  if (isAuthenticated) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
   return <Outlet />;
