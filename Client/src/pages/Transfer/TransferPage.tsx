@@ -150,6 +150,18 @@ export default function TransferPage() {
     setIsPinModalOpen(true);
   }
 
+
+
+function handleRecentAccountSelect(selectedAccountNumber: string) {
+  setAccountNumber(selectedAccountNumber);
+  setRecipient(null);
+  setError("");
+
+  // Reuse the existing backend recipient lookup.
+  void handleRecipientLookup(selectedAccountNumber);
+}
+
+
   // =========================================
   // PIN CONFIRMED
   // =========================================
@@ -249,6 +261,7 @@ export default function TransferPage() {
                         handleAccountNumberChange
                       }
                       onContinue={handleContinue}
+                      onRecentAccountSelect={handleRecentAccountSelect}
                     />
                   )}
 
