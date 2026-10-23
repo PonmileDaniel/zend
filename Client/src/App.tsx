@@ -8,8 +8,20 @@ import Otp from "./pages/auth/Otp";
 import LoginOtp from "./pages/auth/loginOtp";
 import Dashboard from "./pages/dashboard/Dashboard";
 import TransferPage from "./pages/Transfer/TransferPage";
+import { AuthProvider } from "./context/AuthProvider";
+import { useAuth } from "./context/useAuth";
+import PublicRoute from "./components/protectroute/PublicRoute";
+import ProtectedRoute from "./components/protectroute/ProtectedRoute";
 
-function App() {
+function HomeRedirect() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Checking your session...</div>;
+  }
+  return <Navigate to={isAuthenticated ? "/dashboard" : "login"} replace />;
+}
+function AppRoutes() {
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
@@ -25,20 +37,31 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
+    <Routes>
+      // Public Authentication pages
+      <Route element={<PublicRoute />}>
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/otp" element={<Otp />} />
-        <Route path="/otp-login" element={<LoginOtp />} />
-        
+      </Route>
+      <Route path="/otp" element={<Otp />} />
+      <Route path="/otp-login" element={<LoginOtp />} />
+      {/* Protected pages */}
+      <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/transfer" element={<TransferPage />} />
+      </Route>
+      <Route path="/" element={<HomeRedirect />} />
+      <Route path="*" element={<HomeRedirect />} />
+    </Routes>
+  );
+}
 
-        <Route path="/" element={<Navigate to="/signup" replace />} />
-
-        <Route path="*" element={<Navigate to="/signup" replace />} />
-      </Routes>
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </BrowserRouter>
   );
 }
