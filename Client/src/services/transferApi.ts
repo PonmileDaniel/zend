@@ -12,6 +12,11 @@ export interface TransferRequest {
   pin: string;
 }
 
+export interface RecentAccountResponse {
+  name: string;
+  accountNumber: string;
+}
+
 export async function getRecipient(
   accountNumber: string,
 ): Promise<RecipientResponse> {
@@ -44,4 +49,15 @@ export async function transferMoney(request: TransferRequest): Promise<string> {
     throw new Error(result);
   }
   return result;
+}
+
+export async function getRecentAccounts(): Promise<RecentAccountResponse[]> {
+  const response = await fetch(`${API_URL_TRANSFER}/recent-accounts`, {
+    method: "GET",
+    credentials: "include",
+  });
+  if (!response.ok) {
+    throw new Error("Could not load recent accounts");
+  }
+  return response.json();
 }
