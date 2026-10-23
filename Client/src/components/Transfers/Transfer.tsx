@@ -1,27 +1,11 @@
 import { ArrowRight, Clock3 } from "lucide-react";
-import type { ChangeEvent, FormEvent } from "react";
-import type { RecipientResponse } from "../../services/transferApi";
+import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
+import {
+  getRecentAccounts,
+  type RecipientResponse,
+  type RecentAccountResponse,
+} from "../../services/transferApi";
 import MobileBackButton from "../dashboard/MobileBackButton";
-
-type RecentTransfer = {
-  name: string;
-  accountNumber: string;
-};
-
-const recentTransfers: RecentTransfer[] = [
-  {
-    name: "Daniel Ihenychukwu Ndukwe",
-    accountNumber: "2919144394",
-  },
-  {
-    name: "John Doe",
-    accountNumber: "1029384756",
-  },
-  {
-    name: "Jane Smith",
-    accountNumber: "3847562910",
-  },
-];
 
 interface TransferProps {
   accountNumber: string;
@@ -30,6 +14,7 @@ interface TransferProps {
   error: string;
   onAccountNumberChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onContinue: () => void;
+  onRecentAccountSelect: (accountNumber: string) => void;
 }
 
 export default function Transfer({
@@ -39,7 +24,13 @@ export default function Transfer({
   error,
   onAccountNumberChange,
   onContinue,
+  onRecentAccountSelect,
 }: TransferProps) {
+  const [recentAccounts, setRecentAccounts] = useState<RecentAccountResponse[]>(
+    [],
+  );
+  const [recentAccountsLoading, setRecentAccountsLoading] = useState(true);
+  const [recentAccountsError, setRecentAccountsError] = useState("");
   const isValidAccountNumber = accountNumber.length === 10;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -55,6 +46,37 @@ export default function Transfer({
       recipient,
     });
   };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadRecentAccounts() {
+      try {
+        setRecentAccountsLoading(true);
+        setRecentAccountsError("");
+
+        const accounts = await getRecentAccounts();
+
+        if (!cancelled) {
+          setRecentAccounts(accounts.slice(0, 3));
+        }
+      } catch {
+        if (!cancelled) {
+          setRecentAccountsError("Unable to load recent accounts.");
+        }
+      } finally {
+        if (!cancelled) {
+          setRecentAccountsLoading(false);
+        }
+      }
+    }
+
+    loadRecentAccounts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -151,56 +173,74 @@ export default function Transfer({
           </button>
         </form>
       </section>
+
       <section>
-        <div className="mb-3 flex items-center justify-between">
-          <div>
-            <h2 className="text-sm font-semibold">Recent transfers</h2>
+        <div className="mb-3">
+          <h2 className="text-sm font-semibold">Recent accounts</h2>
 
-            <p className="mt-1 text-xs text-[#666]">
-              People you've recently sent money to.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            className="text-xs font-medium text-[#999] transition-colors hover:text-white"
-          >
-            View more
-          </button>
+          <p className="mt-1 text-xs text-[#666]">
+            People you've recently sent money to.
+          </p>
         </div>
 
         <div className="border border-[#262626] bg-[#1A181A]">
-          {recentTransfers.map((transfer, index) => (
-            <button
-              key={`${transfer.accountNumber}-${index}`}
-              type="button"
-              className="flex w-full items-center justify-between border-b border-[#262626] px-4 py-4 text-left transition-colors last:border-b-0 hover:bg-[#202020]"
-            >
-              <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-[#303030] bg-[#0A0A0A]">
-                  <span className="text-sm font-semibold text-white">
-                    {transfer.name.charAt(0)}
-                  </span>
+          {recentAccountsLoading ? (
+            <div className="flex items-center gap-3 px-4 py-5 text-sm text-[#777]">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#444] border-t-white" />
+              Loading recent accounts...
+            </div>
+          ) : recentAccountsError ? (
+            <div className="px-4 py-5">
+              <p className="text-sm text-[#f87171]">{recentAccountsError}</p>
+
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="mt-2 text-xs text-white underline"
+              >
+                Reload page
+              </button>
+            </div>
+          ) : recentAccounts.length === 0 ? (
+            <div className="px-4 py-6">
+              <p className="text-sm text-[#aaa]">No recent accounts yet.</p>
+              <p className="mt-1 text-xs text-[#666]">
+                Recipients will appear here after a successful transfer.
+              </p>
+            </div>
+          ) : (
+            recentAccounts.map((account) => (
+              <button
+                key={account.accountNumber}
+                type="button"
+                onClick={() => onRecentAccountSelect(account.accountNumber)}
+                className="flex w-full items-center justify-between border-b border-[#262626] px-4 py-4 text-left transition-colors last:border-b-0 hover:bg-[#202020]"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-[#303030] bg-[#0A0A0A]">
+                    <span className="text-sm font-semibold text-white">
+                      {account.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">
+                      {account.name}
+                    </p>
+
+                    <p className="mt-1 font-mono text-xs text-[#666]">
+                      {account.accountNumber}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">
-                    {transfer.name}
-                  </p>
-
-                  <p className="mt-1 font-mono text-xs text-[#666]">
-                    {transfer.accountNumber}
-                  </p>
+                <div className="ml-4 flex shrink-0 items-center gap-3">
+                  <Clock3 size={15} className="hidden text-[#555] sm:block" />
+                  <ArrowRight size={16} className="text-[#666]" />
                 </div>
-              </div>
-
-              <div className="ml-4 flex shrink-0 items-center gap-3">
-                <Clock3 size={15} className="hidden text-[#555] sm:block" />
-
-                <ArrowRight size={16} className="text-[#666]" />
-              </div>
-            </button>
-          ))}
+              </button>
+            ))
+          )}
         </div>
       </section>
     </div>
